@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../ConfigRecorder/ConfigRecorder.csproj" />
+  <Project Path="CursorTail.csproj" />
+</Solution>
