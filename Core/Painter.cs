@@ -14,6 +14,7 @@ using Point = System.Windows.Point;
 using Color = System.Windows.Media.Color;
 using Pen = System.Windows.Media.Pen;
 using Size = System.Windows.Size;
+using Windows.Win32;
 
 namespace CursorTail.Core
 {
@@ -30,12 +31,14 @@ namespace CursorTail.Core
         public Point ImgTransOffset;
         public double ImgAngleOffset;
         public double ImgScale;
-        public Point? StartPoint;
+        public bool IsFollowMode;
+        public bool IsFlipGif;
 
         private StreamGeometry _geometry;
         private TransformGroup _imgTrans;
         private TranslateTransform _imgTranslate;
         private RotateTransform _imgRotate;
+        private ScaleTransform _imgFlip;
 
         private DrawingVisual _geoVisual;
         private DrawingVisual _imgVisual;
@@ -43,7 +46,7 @@ namespace CursorTail.Core
 
         private GIFLoder _gifLoder;
         //private BitmapSource _imgSource;
-        
+
         /// <summary>
         /// 缩放尺寸
         /// </summary>
@@ -56,7 +59,8 @@ namespace CursorTail.Core
         protected override int VisualChildrenCount => 2;
         protected override Visual GetVisualChild(int index) => _visuals[index];
 
-        public PainterVisionHost(Rope rope, Color fill, Color stroke, Point imgOffset, double imgAngle, GIFLoder loder, double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, Point? startPoint = null)
+        public PainterVisionHost(Rope rope, Color fill, Color stroke, Point imgOffset, double imgAngle, GIFLoder loder,
+            double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, bool isFollow = true, bool flipGif = false)
         {
             //同步变量
             _rope = rope;
@@ -67,10 +71,13 @@ namespace CursorTail.Core
             ImgTransOffset = imgOffset;
             ImgAngleOffset = imgAngle;
             ImgScale = scale;
+            IsFollowMode = isFollow;
+            IsFlipGif = flipGif;
             //实例化变量
             _geometry = new StreamGeometry();
             _geoVisual = new DrawingVisual();
             _imgVisual = new DrawingVisual();
+            _imgFlip = new ScaleTransform(1, 1);
             _visuals = [_geoVisual, _imgVisual];
             AddVisualChild(_geoVisual);
             AddVisualChild(_imgVisual);
@@ -79,11 +86,11 @@ namespace CursorTail.Core
             _imgRotate = new RotateTransform();
             _imgTrans = new TransformGroup();
             _imgTrans.Children.Add(_imgTranslate);
+            _imgTrans.Children.Add(_imgFlip);
             _imgTrans.Children.Add(_imgRotate);
 
             _gifLoder = loder;
             ResetGeometryProps();
-            StartPoint = startPoint;
         }
 
         /// <summary>
@@ -98,6 +105,7 @@ namespace CursorTail.Core
             _imgTranslate.X = -_rectScale.Width / 2 + ImgTransOffset.X;
             _imgTranslate.Y = -_rectScale.Height / 2 + ImgTransOffset.Y;
         }
+
         private const double at = 180 / MathF.PI;
         public void UpdatePrepare()
         {
@@ -105,38 +113,45 @@ namespace CursorTail.Core
             _geometry.Clear();
 
             int secondLastIndex = ropeNodes.Length - 2;
+
             //定位矩形：左上角定位+偏移+缩放
             _imgRect = new Rect(ropeNodes[secondLastIndex + 1].X, ropeNodes[secondLastIndex + 1].Y, _rectScale.Width, _rectScale.Height);
 
-            //旋转：旋转中心+角度偏移
-            _imgRotate.CenterX = ropeNodes[secondLastIndex + 1].X;
-            _imgRotate.CenterY = ropeNodes[secondLastIndex + 1].Y;
-            Vector2 A2B = _rope.GetNodeByIndex(secondLastIndex + 1) - _rope.GetNodeByIndex(secondLastIndex);
-            if (A2B.Y > 0 && A2B.Y < 0.0001f)
+            Vector2 A2B = _rope.GetNodeByIndex(secondLastIndex) - _rope.GetNodeByIndex(secondLastIndex + 1);
+            A2B *= new Vector2(1, -1);
+            _imgFlip.ScaleX = IsFlipGif ? -1 : 1;
+            //水平反转
+            if (IsFollowMode)
             {
-                _imgRotate.Angle = 90 + ImgAngleOffset;
+                if (A2B.X < 0)
+                {
+                    _imgFlip.ScaleY = -1;
+                }
+                else
+                {
+                    _imgFlip.ScaleY = 1;
+                }
             }
-            else if (A2B.Y < 0 && A2B.Y > -0.0001f)
+
+            //旋转：旋转中心+角度偏移
+            _imgRotate.CenterX = _imgFlip.CenterX = ropeNodes[secondLastIndex + 1].X;
+            _imgRotate.CenterY = _imgFlip.CenterY = ropeNodes[secondLastIndex + 1].Y;
+            if (A2B.Y < 0.001f && A2B.Y > 0 || A2B.Y > -0.001f && A2B.Y < 0)
             {
-                _imgRotate.Angle = -90 + ImgAngleOffset;
+                _imgRotate.Angle = 90 * (A2B.X > 0 ? 1 : -1) + ImgAngleOffset;
             }
             else
             {
-                _imgRotate.Angle = -Math.Atan(A2B.X / A2B.Y) * at + ImgAngleOffset;
+                _imgRotate.Angle = Math.Atan(A2B.X / A2B.Y) * at + ImgAngleOffset;
                 if (A2B.Y < 0)
                 {
                     _imgRotate.Angle += 180;
                 }
             }
+
+
             using (StreamGeometryContext sgc = _geometry.Open())
             {
-                if (StartPoint != null)
-                {
-                    Parallel.For(0, ropeNodes.Length, (i) =>
-                    {
-                        ropeNodes[i] = new(ropeNodes[i].X - StartPoint.Value.X, ropeNodes[i].Y - StartPoint.Value.Y);
-                    });
-                }
                 sgc.BeginFigure(ropeNodes[0], false, false);
                 for (int i = 1; i < ropeNodes.Length; i++)
                 {
@@ -144,7 +159,6 @@ namespace CursorTail.Core
                 }
             }
         }
-
         public void Update()
         {
             _gifLoder.LoadFrameControler.Invoke();

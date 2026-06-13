@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Windows;
+using System.Windows.Media;
 
 namespace CursorTail.Core
 {
@@ -45,7 +47,7 @@ namespace CursorTail.Core
             _previousFrame = currentFrame;
             if (_accrumulateTime >= TargetFrameTime)
             {
-                _accrumulateTime = 0;
+                _accrumulateTime -= TargetFrameTime;
                 _frameCount++;
                 return true;
             }

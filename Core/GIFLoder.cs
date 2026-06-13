@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Media.Imaging;
+using Windows.Win32;
 
 namespace CursorTail.Core
 {
@@ -10,11 +12,6 @@ namespace CursorTail.Core
     {
         private FrameController _gifFC;
         private StateMachine _stateMachine;
-        public int TargetFrame
-        {
-            get => (int)(1 / (_gifFC.TargetFrameTime / 1000));
-            set => _gifFC.TargetFrameTime = 1 / value * 1000;
-        }
         private int _loopCount;
         private int _currentIndex;
         private BitmapSource[][] _bitmapSources;
@@ -22,19 +19,26 @@ namespace CursorTail.Core
         {
             get => (int)_stateMachine.CurrentState;
         }
-        public int MaxLoopCount;
 
-        public GIFLoder(StateMachine stateMachine, int loopCount, int targetFPS = 10, string GifFouder = "Hachimi")
+        public string GifFolder;
+        public int MaxLoopCount;
+        public int TargetFrame
+        {
+            get => (int)Math.Round(1000 / _gifFC.TargetFrameTime);
+            set => _gifFC.TargetFrameTime = 1.0 / value * 1000;
+        }
+
+        public GIFLoder(StateMachine stateMachine, int loopCount, string gifFolder, int targetFPS = 10)
         {
             _gifFC = new(GenerateToNextFrame, targetFPS);
             MaxLoopCount = loopCount;
             _stateMachine = stateMachine;
             _stateMachine.RaiseStateChange += RaiseStateChange;
             _stateMachine.RaiseStateKeep += RaiseStateKeep;
-            LoadAllImgs(GifFouder);
+            GifFolder = gifFolder;
+            LoadAllImgs(GifFolder);
         }
-
-        public void LoadAllImgs(string GifFonder)
+        public bool LoadAllImgs(string gifFonder)
         {
             try
             {
@@ -44,7 +48,17 @@ namespace CursorTail.Core
                 string[] stats = Enum.GetNames(typeof(States));
                 for (int i = 0; i < stats.Length; i++)
                 {
-                    imgPath[i] = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GifFonder + "/" + stats[i]));
+                    var currentDir = Path.Combine(gifFonder, stats[i]);
+                    if (!Directory.Exists(currentDir) || Directory.GetFiles(currentDir).Length == 0)
+                    {
+                        if (i == 0)
+                        {
+                            throw new Exception("Can't find any image.");
+                        }
+                        imgPath[i] = imgPath[0];
+                    }
+                    imgPath[i] = Directory.GetFiles(currentDir);
+                    //Array.Sort(imgPath[i], StrCmpLogicalW);
                     _bitmapSources[i] = new BitmapSource[imgPath[i].Length];
                 }
                 for (int i = 0; i < 4; i++)
@@ -55,11 +69,24 @@ namespace CursorTail.Core
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                MessageBox.Show("Gif文件夹格式错误，请参照示例文件夹，程序退出", "错误", MessageBoxButtons.OK);
-                App.Current.MainWindow.Close();
+                var defaultPath = Path.Combine(AppContext.BaseDirectory, "GIFs\\Hachimi");
+                if (GifFolder != defaultPath)
+                {
+                    MessageBox.Show("Gif文件夹格式错误，尝试加载示例文件夹，请参照示例文件结构。\n需要保证至少有Stoped文件夹即至少一个图片", "错误", MessageBoxButtons.OK);
+                    GifFolder = defaultPath;
+                    LoadAllImgs(GifFolder);
+                    return false;
+                }
+                else
+                {
+                    MessageBox.Show("Gif示例文件夹怎么也没了？程序退出。\n ! ? 删删 ? ! ", "错误", MessageBoxButtons.OK);
+                    App.Current.MainWindow.Close();
+                    return false;
+                }
             }
+            return true;
         }
         public BitmapSource GetCurrentFrame => _bitmapSources[_currentState][_currentIndex];
         public Action LoadFrameControler => _gifFC.UpdateFrame;

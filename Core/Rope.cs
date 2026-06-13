@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 using System.Windows;
+using Windows.Win32;
 using Point = System.Windows.Point;
 
 namespace CursorTail.Core
@@ -14,7 +15,7 @@ namespace CursorTail.Core
 
         private List<Vector2> _oldNodes;
         private List<Vector2> _newNodes;
-        private Vector2 _oldTailV = new Vector2(0);
+        private Vector2 _oldCursorPos = new Vector2(0);
         public float Gravity;
         public float Stiffness;
         public float Damp;
@@ -24,6 +25,7 @@ namespace CursorTail.Core
         public int NodeNums;
         public Vector2 CollideBox;
         public float CollideRadius;
+        public int FastVelocity;
         //public Vector2 CenterPoint;
         //public double BoxSize => NodeNums * NodeLength / Stiffness * 3 * 2;
         public Point[] _dPoints;
@@ -38,6 +40,7 @@ namespace CursorTail.Core
             int iterations = 10,//1-15
             int nodeLength = 8,//1-10
             int nodeNums = 10,
+            int fastVelocity = 40,
             float collideRadius = 5)
         {
             Gravity = gravity;
@@ -47,6 +50,7 @@ namespace CursorTail.Core
             Iterations = iterations;
             NodeLength = nodeLength;
             NodeNums = nodeNums;
+            FastVelocity = fastVelocity;
             //CenterPoint = new Vector2((float)BoxSize/2);
             CollideBox = collideBox;
             _stateMachine = stateMachine;
@@ -61,20 +65,20 @@ namespace CursorTail.Core
             //左闭右开
             Parallel.For(0, NodeNums + 1, (i) =>
             {
-                var temp = _newNodes[i];
                 if (i == 0)
                 {
                     _newNodes[0] = newCursorPos;
                 }
                 else
                 {
+                    var temp = _newNodes[i];
                     var velocity = _newNodes[i] - _oldNodes[i] + new Vector2(0, Gravity);
                     _newNodes[i] += velocity * Damp;
 
                     if (i == _newNodes.Count - 1)
                     {
                         var v = velocity.Length();
-                        if (v > 50)
+                        if (v > FastVelocity)
                         {
                             _stateMachine.SwitchTo(States.FastMoved);
                         }
@@ -87,41 +91,41 @@ namespace CursorTail.Core
                             _stateMachine.SwitchTo(States.SlowMoved);
                         }
                     }
-                }
 
-                #region 边界碰撞
-                //边界碰撞处理
-                bool isCrashed = false;
-                var Crashed = _newNodes[i];
-                if (_newNodes[i].X < CollideRadius)
-                {
-                    isCrashed = true;
-                    Crashed.X = CollideRadius;
-                }
-                if (_newNodes[i].Y < CollideRadius)
-                {
-                    isCrashed = true;
-                    Crashed.Y = CollideRadius;
-                }
-                if (_newNodes[i].X > CollideBox.X - CollideRadius)
-                {
-                    isCrashed = true;
-                    Crashed.X = CollideBox.X - CollideRadius;
-                }
-                if (_newNodes[i].Y > CollideBox.Y - CollideRadius)
-                {
-                    isCrashed = true;
-                    Crashed.Y = CollideBox.Y - CollideRadius;
-                }
-                if (isCrashed)
-                {
-                    temp = _newNodes[i];
-                    _newNodes[i] = Crashed;
-                    _stateMachine.SwitchTo(States.Collided);
-                }
-                #endregion
+                    #region 边界碰撞
+                    //边界碰撞处理
+                    bool isCrashed = false;
+                    var Crashed = _newNodes[i];
+                    if (_newNodes[i].X < CollideRadius)
+                    {
+                        isCrashed = true;
+                        Crashed.X = CollideRadius;
+                    }
+                    if (_newNodes[i].Y < CollideRadius)
+                    {
+                        isCrashed = true;
+                        Crashed.Y = CollideRadius;
+                    }
+                    if (_newNodes[i].X > CollideBox.X - CollideRadius)
+                    {
+                        isCrashed = true;
+                        Crashed.X = CollideBox.X - CollideRadius;
+                    }
+                    if (_newNodes[i].Y > CollideBox.Y - CollideRadius)
+                    {
+                        isCrashed = true;
+                        Crashed.Y = CollideBox.Y - CollideRadius;
+                    }
+                    if (isCrashed)
+                    {
+                        temp = _newNodes[i];
+                        _newNodes[i] = Crashed;
+                        _stateMachine.SwitchTo(States.Collided);
+                    }
+                    #endregion
 
-                _oldNodes[i] = temp;
+                    _oldNodes[i] = temp;
+                }
             });
         }
 
