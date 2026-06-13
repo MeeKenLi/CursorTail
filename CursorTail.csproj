@@ -6,11 +6,125 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>e0kxp-c5dh9-001.ico</ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <UseWindowsForms>True</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="e0kxp-c5dh9-001.ico" />
+    <None Remove="Hachimi\Collided\1.png" />
+    <None Remove="Hachimi\Collided\2.png" />
+    <None Remove="Hachimi\Collided\3.png" />
+    <None Remove="Hachimi\Collided\4.png" />
+    <None Remove="Hachimi\Collided\5.png" />
+    <None Remove="Hachimi\Collided\6.png" />
+    <None Remove="Hachimi\Collided\7.png" />
+    <None Remove="Hachimi\Collided\8.png" />
+    <None Remove="Hachimi\Collided\9.png" />
+    <None Remove="Hachimi\FastMoved\1.png" />
+    <None Remove="Hachimi\FastMoved\2.png" />
+    <None Remove="Hachimi\FastMoved\3.png" />
+    <None Remove="Hachimi\FastMoved\4.png" />
+    <None Remove="Hachimi\SlowMoved\1.png" />
+    <None Remove="Hachimi\SlowMoved\2.png" />
+    <None Remove="Hachimi\SlowMoved\3.png" />
+    <None Remove="Hachimi\SlowMoved\4.png" />
+    <None Remove="Hachimi\Stoped\1.png" />
+    <None Remove="Hachimi\Stoped\2.png" />
+    <None Remove="Hachimi\Stoped\3.png" />
+    <None Remove="Hachimi\Stoped\4.png" />
+    <None Remove="Hachimi\Stoped\5.png" />
+    <None Remove="Hachimi\Stoped\6.png" />
+    <None Remove="Hachimi\Stoped\7.png" />
+    <None Remove="Hachimi\Stoped\8.png" />
+    <None Remove="Hachimi\Stoped\9.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Core\icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="icon.ico" />
+    <Content Include="Hachimi\Collided\1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\8.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Collided\9.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\SlowMoved\1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\SlowMoved\2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\SlowMoved\3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\SlowMoved\4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Hachimi\FastMoved\1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\FastMoved\2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\FastMoved\3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\FastMoved\4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\8.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Hachimi\Stoped\9.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

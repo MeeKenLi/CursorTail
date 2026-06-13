@@ -17,6 +17,10 @@ using System.Windows.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
+using Point = System.Windows.Point;
+using Color = System.Windows.Media.Color;
+using System.IO;
+using System.Reflection;
 
 namespace CursorTail
 {
@@ -29,18 +33,24 @@ namespace CursorTail
         public PainterVisionHost painter;
         public FrameController frameController;
         private DpiScale _dpiScale;
+        public MainWindowViewModel ViewModel;
+        public StateMachine stateMachine;
+        public GIFLoder gifLoder;
         public MainWindow()
         {
             InitializeComponent();
             _dpiScale = VisualTreeHelper.GetDpi(this);
             SourceInitialized += OnSourceInitialized;
             this.SnapsToDevicePixels = true;
+            LoadTaskIcon();
 
             //临时测试部分
-            rope = new Rope(new Vector2((float)SystemParameters.PrimaryScreenWidth, (float)SystemParameters.PrimaryScreenHeight));
+            stateMachine = new();
+            rope = new Rope(new Vector2((float)SystemParameters.PrimaryScreenWidth, (float)SystemParameters.PrimaryScreenHeight), stateMachine);
             this.Width = SystemParameters.PrimaryScreenWidth;
             this.Height = SystemParameters.PrimaryScreenHeight;
-            painter = new PainterVisionHost(rope, Color.FromRgb(255, 0, 0), Color.FromRgb(0, 0, 0), new Point(0, 20), 0, new Uri("D:\\Learn\\Useful C3\\CursorTail\\TailImg\\sayori.png", UriKind.RelativeOrAbsolute));
+            gifLoder = new(stateMachine, 4);
+            painter = new PainterVisionHost(rope, Color.FromRgb(255, 255, 0), Color.FromRgb(0, 0, 0), new Point(0, 0), 0, gifLoder);
             MainCanvas.Children.Add(painter);
             frameController = new FrameController(UpdatePerFrame, 60);
 
@@ -87,6 +97,39 @@ namespace CursorTail
             var hwnd = new WindowInteropHelper(this).Handle;
             int currentExStyle = PInvoke.GetWindowLong(new HWND(hwnd), GWL_EXSTYLE);
             PInvoke.SetWindowLong(new HWND(hwnd), GWL_EXSTYLE, currentExStyle | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW);
+        }
+
+        SettingWindow? _settingWindow;
+        private void LoadTaskIcon()
+        {
+            NotifyIcon notifyIcon = new NotifyIcon()
+            {
+                Text = "CursorTail",
+                Icon = new System.Drawing.Icon(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Core/icon.ico")),
+            };
+            EventHandler openSetting = (s, e) =>
+            {
+                _settingWindow = new SettingWindow(ViewModel, painter, _dpiScale);
+                _settingWindow.Show();
+            };
+            //notifyIcon.DoubleClick += openSetting;
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+            ToolStripButton setting = new ToolStripButton("设置");
+            setting.Click += openSetting;
+            ToolStripButton exit = new ToolStripButton("退出");
+            exit.Click += (s, e) => this.Close();
+            contextMenu.Items.Add(setting);
+            contextMenu.Items.Add(exit);
+            notifyIcon.ContextMenuStrip = contextMenu;
+            notifyIcon.Visible = true;
+            this.Closing += (s, e) =>
+            {
+                notifyIcon.Dispose();
+                if (_settingWindow != null)
+                {
+                    _settingWindow.Close();
+                }
+            };
         }
     }
 }

@@ -6,6 +6,10 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using ConfigRecorder;
+using Point = System.Windows.Point;
+using Color = System.Windows.Media.Color;
+using Pen = System.Windows.Media.Pen;
+using Size = System.Windows.Size;
 
 namespace CursorTail.Core
 {
@@ -26,8 +30,11 @@ namespace CursorTail.Core
     {
         public Rope rope;
         public PainterVisionHost painter;
+        public FrameController frameController;
+        public Uri SavePath = App.Current.StartupUri;
         public void CreatRecords()
         {
+            RM.RC.Add(new(typeof(string), "StrokeColor", "255,0,0,0"));
             RM.RC.Add(new(typeof(double), "Gravity", 1));
             RM.RC.Add(new(typeof(double), "Stiffness", 1));
             RM.RC.Add(new(typeof(double), "Damp", 1));
@@ -35,7 +42,8 @@ namespace CursorTail.Core
             RM.RC.Add(new(typeof(int), "Iterations", 10));
             RM.RC.Add(new(typeof(int), "NodeLength", 5));
             RM.RC.Add(new(typeof(int), "NodeNums", 18));
-            RM.RC.Add(new(typeof(int), "RopeWidth", 3));
+            RM.RC.Add(new(typeof(double), "RopeWidth", 3));
+            RM.RC.Add(new(typeof(double), "StrokeWidth", 3));
             RM.RC.Add(new(typeof(string), "RopeColor", "255,0,0,0"));
             RM.RC.Add(new(typeof(double), "ImgTransOffset_X", 1));
             RM.RC.Add(new(typeof(double), "ImgTransOffset_Y", 1));
@@ -46,16 +54,19 @@ namespace CursorTail.Core
         }
         public void ReadProps()
         {
-            Gravity=RM.RC["Gravity"].GetValue(Gravity);
-            Stiffness= RM.RC["Stiffness"].GetValue(Stiffness);
+            Gravity = RM.RC["Gravity"].GetValue(Gravity);
+            Stiffness = RM.RC["Stiffness"].GetValue(Stiffness);
             Damp = RM.RC["Damp"].GetValue(Damp);
             Mass = RM.RC["Mass"].GetValue(Mass);
             Iterations = RM.RC["Iterations"].GetValue(Iterations);
             NodeLength = RM.RC["NodeLength"].GetValue(NodeLength);
             NodeNums = RM.RC["NodeNums"].GetValue(NodeNums);
             RopeWidth = RM.RC["RopeWidth"].GetValue(RopeWidth);
+            StrokeWidth = RM.RC["StrokeWidth"].GetValue(StrokeWidth);
             var argb = RM.RC["RopeColor"].GetValue<string>().Split(',').Select((v) => Convert.ToByte(v)).ToArray();
             RopeColor = Color.FromArgb(argb[0], argb[1], argb[2], argb[3]);
+            argb = RM.RC["StrokeColor"].GetValue<string>().Split(',').Select((v) => Convert.ToByte(v)).ToArray();
+            StrokeColor = Color.FromArgb(argb[0], argb[1], argb[2], argb[3]);
             ImgTransOffset_X = RM.RC["ImgTransOffset_X"].GetValue(ImgTransOffset_X);
             ImgTransOffset_Y = RM.RC["ImgTransOffset_Y"].GetValue(ImgTransOffset_Y);
             ImgAngleOffset = RM.RC["ImgAngleOffset"].GetValue(ImgAngleOffset);
@@ -65,6 +76,22 @@ namespace CursorTail.Core
         }
 
         #region 属性声明
+        private Uri _currentConfig;
+
+        public Uri CurrentConfig
+        {
+            get => _currentConfig;
+            set
+            {
+                if (_currentConfig != value)
+                {
+                    _currentConfig = value;
+                    RaisePropertyChanged();
+                    RecordPropChanged(value.ToString);
+                }
+            }
+        }
+
         //public float Gravity;
         public float Gravity
         {
@@ -183,6 +210,20 @@ namespace CursorTail.Core
                 }
             }
         }
+        public double StrokeWidth
+        {
+            get => painter.StrokeWidth;
+            set
+            {
+                if (painter.StrokeWidth != value)
+                {
+                    painter.StrokeWidth = value;
+                    RaisePropertyChanged();
+                    RecordPropChanged(value);
+                }
+            }
+        }
+
         public Color RopeColor
         {
             get => painter.RopeColor;
@@ -191,6 +232,20 @@ namespace CursorTail.Core
                 if (painter.RopeColor != value)
                 {
                     painter.RopeColor = value;
+                    RaisePropertyChanged();
+                    RecordPropChanged($"{value.A},{value.R},{value.G},{value.B}");
+                    painter.ResetGeometryProps();
+                }
+            }
+        }
+        public Color StrokeColor
+        {
+            get => painter.RopeStroke;
+            set
+            {
+                if (painter.RopeStroke != value)
+                {
+                    painter.RopeStroke = value;
                     RaisePropertyChanged();
                     RecordPropChanged($"{value.A},{value.R},{value.G},{value.B}");
                     painter.ResetGeometryProps();
@@ -282,6 +337,7 @@ namespace CursorTail.Core
                 }
             }
         }
+        public int FPS { get=>frameController.FPS;  }
         #endregion
     }
 }

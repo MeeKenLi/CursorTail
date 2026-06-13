@@ -4,14 +4,17 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 using System.Windows;
+using Point = System.Windows.Point;
 
 namespace CursorTail.Core
 {
     public class Rope
     {
+        private StateMachine _stateMachine;
+
         private List<Vector2> _oldNodes;
         private List<Vector2> _newNodes;
-        //private Vector2 _oldCursorPos;
+        private Vector2 _oldTailV = new Vector2(0);
         public float Gravity;
         public float Stiffness;
         public float Damp;
@@ -20,19 +23,22 @@ namespace CursorTail.Core
         public int NodeLength;
         public int NodeNums;
         public Vector2 CollideBox;
+        public float CollideRadius;
         //public Vector2 CenterPoint;
         //public double BoxSize => NodeNums * NodeLength / Stiffness * 3 * 2;
         public Point[] _dPoints;
 
         public Rope(
             Vector2 collideBox,
-            float gravity = 1f,//0-2
+            StateMachine stateMachine,
+            float gravity = 0f,//0-2
             float stiffness = 1f,
             float mass = 0.5f,//0.3-2
             float damp = 0.95f, //0.85-1.0
             int iterations = 10,//1-15
-            int nodeLength = 10,//1-10
-            int nodeNums = 9)
+            int nodeLength = 8,//1-10
+            int nodeNums = 10,
+            float collideRadius = 5)
         {
             Gravity = gravity;
             Stiffness = stiffness;
@@ -43,17 +49,15 @@ namespace CursorTail.Core
             NodeNums = nodeNums;
             //CenterPoint = new Vector2((float)BoxSize/2);
             CollideBox = collideBox;
+            _stateMachine = stateMachine;
             _newNodes = new List<Vector2>();
             _oldNodes = new List<Vector2>();
             InitNodes();
+            CollideRadius = collideRadius;
         }
 
         public void UpdateGravity(Vector2 newCursorPos)
         {
-
-            //var cursorVelocity = newCursorPos - _oldCursorPos;
-            //_oldCursorPos = newCursorPos;
-
             //左闭右开
             Parallel.For(0, NodeNums + 1, (i) =>
             {
@@ -66,35 +70,54 @@ namespace CursorTail.Core
                 {
                     var velocity = _newNodes[i] - _oldNodes[i] + new Vector2(0, Gravity);
                     _newNodes[i] += velocity * Damp;
+
+                    if (i == _newNodes.Count - 1)
+                    {
+                        var v = velocity.Length();
+                        if (v > 50)
+                        {
+                            _stateMachine.SwitchTo(States.FastMoved);
+                        }
+                        else if (v <= 5)
+                        {
+                            _stateMachine.SwitchTo(States.Stoped);
+                        }
+                        else
+                        {
+                            _stateMachine.SwitchTo(States.SlowMoved);
+                        }
+                    }
                 }
+
                 #region 边界碰撞
                 //边界碰撞处理
                 bool isCrashed = false;
                 var Crashed = _newNodes[i];
-                if (_newNodes[i].X < 0)
+                if (_newNodes[i].X < CollideRadius)
                 {
                     isCrashed = true;
-                    Crashed.X = 0;
+                    Crashed.X = CollideRadius;
                 }
-                if (_newNodes[i].Y < 0)
+                if (_newNodes[i].Y < CollideRadius)
                 {
                     isCrashed = true;
-                    Crashed.Y = 0;
+                    Crashed.Y = CollideRadius;
                 }
-                if (_newNodes[i].X > CollideBox.X)
+                if (_newNodes[i].X > CollideBox.X - CollideRadius)
                 {
                     isCrashed = true;
-                    Crashed.X = CollideBox.X;
+                    Crashed.X = CollideBox.X - CollideRadius;
                 }
-                if (_newNodes[i].Y > CollideBox.Y)
+                if (_newNodes[i].Y > CollideBox.Y - CollideRadius)
                 {
                     isCrashed = true;
-                    Crashed.Y = CollideBox.Y;
+                    Crashed.Y = CollideBox.Y - CollideRadius;
                 }
                 if (isCrashed)
                 {
                     temp = _newNodes[i];
                     _newNodes[i] = Crashed;
+                    _stateMachine.SwitchTo(States.Collided);
                 }
                 #endregion
 

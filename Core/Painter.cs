@@ -10,6 +10,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
+using Point = System.Windows.Point;
+using Color = System.Windows.Media.Color;
+using Pen = System.Windows.Media.Pen;
+using Size = System.Windows.Size;
 
 namespace CursorTail.Core
 {
@@ -37,7 +41,9 @@ namespace CursorTail.Core
         private DrawingVisual _imgVisual;
         private DrawingVisual[] _visuals;
 
-        private BitmapSource _imgSource;
+        private GIFLoder _gifLoder;
+        //private BitmapSource _imgSource;
+        
         /// <summary>
         /// 缩放尺寸
         /// </summary>
@@ -50,7 +56,7 @@ namespace CursorTail.Core
         protected override int VisualChildrenCount => 2;
         protected override Visual GetVisualChild(int index) => _visuals[index];
 
-        public PainterVisionHost(Rope rope, Color fill, Color stroke, Point imgOffset, double imgAngle, Uri ImgPath, double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.05, Point? startPoint = null)
+        public PainterVisionHost(Rope rope, Color fill, Color stroke, Point imgOffset, double imgAngle, GIFLoder loder, double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, Point? startPoint = null)
         {
             //同步变量
             _rope = rope;
@@ -75,7 +81,7 @@ namespace CursorTail.Core
             _imgTrans.Children.Add(_imgTranslate);
             _imgTrans.Children.Add(_imgRotate);
 
-            _imgSource = new BitmapImage(ImgPath);
+            _gifLoder = loder;
             ResetGeometryProps();
             StartPoint = startPoint;
         }
@@ -87,7 +93,7 @@ namespace CursorTail.Core
         {
             _ropeFullPen = new Pen(new SolidColorBrush(RopeColor), RopeWidth);
             _ropeStrokePen = new Pen(new SolidColorBrush(RopeStroke), StrokeWidth * 2 + RopeWidth);
-            _rectScale = new Size(_imgSource.Width * ImgScale, _imgSource.Height * ImgScale);
+            _rectScale = new Size(_gifLoder.GetCurrentFrame.Width * ImgScale, _gifLoder.GetCurrentFrame.Height * ImgScale);
             //平移：平移至实时中心
             _imgTranslate.X = -_rectScale.Width / 2 + ImgTransOffset.X;
             _imgTranslate.Y = -_rectScale.Height / 2 + ImgTransOffset.Y;
@@ -124,7 +130,14 @@ namespace CursorTail.Core
             }
             using (StreamGeometryContext sgc = _geometry.Open())
             {
-                sgc.BeginFigure(StartPoint ?? ropeNodes[0], false, false);
+                if (StartPoint != null)
+                {
+                    Parallel.For(0, ropeNodes.Length, (i) =>
+                    {
+                        ropeNodes[i] = new(ropeNodes[i].X - StartPoint.Value.X, ropeNodes[i].Y - StartPoint.Value.Y);
+                    });
+                }
+                sgc.BeginFigure(ropeNodes[0], false, false);
                 for (int i = 1; i < ropeNodes.Length; i++)
                 {
                     sgc.LineTo(ropeNodes[i], true, true);
@@ -134,6 +147,7 @@ namespace CursorTail.Core
 
         public void Update()
         {
+            _gifLoder.LoadFrameControler.Invoke();
             UpdatePrepare();
             UpdateGeo();
             UpdateImg();
@@ -156,7 +170,7 @@ namespace CursorTail.Core
             using (DrawingContext idc = _imgVisual.RenderOpen())
             {
                 idc.PushTransform(_imgTrans);
-                idc.DrawImage(_imgSource, _imgRect);
+                idc.DrawImage(_gifLoder.GetCurrentFrame, _imgRect);
                 idc.Pop();
             }
         }

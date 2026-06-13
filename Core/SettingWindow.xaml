@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CursorTail.Core"
         mc:Ignorable="d"
-        Title="SettingWindow" Height="450" Width="800">
+        Title="SettingWindow" Height="600" Width="1200"
+        Topmost="False">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -55,7 +56,6 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.5*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <ScrollViewer Grid.Column="0" Padding="0,0,16,0">
@@ -63,6 +63,26 @@
                 <StackPanel Orientation="Vertical">
                     <TextBlock Style="{StaticResource TitleTextBlock}" Text="设置" />
                     <Border Style="{StaticResource ControlBorder}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock Style="{StaticResource BodyTextBox}">配置文件</TextBlock>
+                                <TextBlock Style="{StaticResource CaptionTextBox}">
+                                    加载配置文件后保存至EXE运行路径
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBox FontSize="12" Margin="0,0,0,12" IsReadOnly="True">D:\CursorTail\bin\Release</TextBox>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" HorizontalAlignment="Stretch">加载</Button>
+                                <Button Grid.Column="2" HorizontalAlignment="Stretch">另存为</Button>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource ControlBorder}" Margin="0,16,0,0">
                         <StackPanel>
                             <TextBlock Style="{StaticResource SubtitleTextBlock}" Text="绳子模拟参数" />
 
@@ -86,7 +106,7 @@
                             值越小绳子形变越容易，1则松弛最小
                                 </TextBlock>
                             </StackPanel>
-                            <Slider Value="{Binding Gravity,Mode=TwoWay}" 
+                            <Slider Value="{Binding Stiffness,Mode=TwoWay}" 
                             TickFrequency="0.1" IsSnapToTickEnabled="True"
                             Maximum="1" Minimum="0.1"></Slider>
 
@@ -98,7 +118,7 @@
                             值越大绳子速度积累受到阻尼越小，1则为无阻尼
                                 </TextBlock>
                             </StackPanel>
-                            <Slider Value="{Binding Gravity,Mode=TwoWay}" 
+                            <Slider Value="{Binding Damp,Mode=TwoWay}" 
                             TickFrequency="0.1" IsSnapToTickEnabled="True"
                             Maximum="1" Minimum="0.1"></Slider>
 
@@ -110,7 +130,7 @@
                             值越大末端节点惯性越大，对鼠标移动反映越激烈
                                 </TextBlock>
                             </StackPanel>
-                            <Slider Value="{Binding Gravity,Mode=TwoWay}" 
+                            <Slider Value="{Binding Mass,Mode=TwoWay}" 
                             TickFrequency="0.1" IsSnapToTickEnabled="True"
                             Maximum="1" Minimum="0.1"></Slider>
 
@@ -122,7 +142,19 @@
                             值越大弹性损耗越小，越小则越松弛，通常5-15
                                 </TextBlock>
                             </StackPanel>
-                            <Slider Value="{Binding Gravity,Mode=TwoWay}" 
+                            <Slider Value="{Binding Iterations,Mode=TwoWay}" 
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            Maximum="25" Minimum="1"></Slider>
+
+                            <Rectangle Style="{StaticResource HorizonSplitLine}"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock Style="{StaticResource BodyTextBox}">链节数目</TextBlock>
+                                <TextBlock Style="{StaticResource CaptionTextBox}">
+                            绳子模拟分辨率
+                                </TextBlock>
+                            </StackPanel>
+                            <Slider Value="{Binding NodeNums,Mode=TwoWay}" 
                             TickFrequency="1" IsSnapToTickEnabled="True"
                             Maximum="25" Minimum="1"></Slider>
 
@@ -131,10 +163,10 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                                 <TextBlock Style="{StaticResource BodyTextBox}">链节长度</TextBlock>
                                 <TextBlock Style="{StaticResource CaptionTextBox}">
-                            绳子模拟分辨率
+                            过短会导致绳子偏软，可能需要配合高迭代数目和刚度
                                 </TextBlock>
                             </StackPanel>
-                            <Slider Value="{Binding Gravity,Mode=TwoWay}" 
+                            <Slider Value="{Binding NodeLength,Mode=TwoWay}" 
                             TickFrequency="1" IsSnapToTickEnabled="True"
                             Maximum="20" Minimum="1"></Slider>
                         </StackPanel>
@@ -154,71 +186,146 @@
                              你甚至可以让他等于0.5，然后在下面挂个鱼钩
                             </TextBlock>
                         </StackPanel>
-                        <Slider Value="{Binding Gravity,Mode=TwoWay}" 
-                            TickFrequency="0.1" IsSnapToTickEnabled="True"
-                            Maximum="10" Minimum="0.1"></Slider>
+                        <Slider Value="{Binding RopeWidth,Mode=TwoWay}" 
+                            TickFrequency="0.01" IsSnapToTickEnabled="True"
+                            Maximum="10" Minimum="0.01"></Slider>
 
                         <Rectangle Style="{StaticResource HorizonSplitLine}"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource BodyTextBox}">绳索颜色</TextBlock>
+                            <TextBlock Style="{StaticResource BodyTextBox}">描边宽度</TextBlock>
+                            <TextBlock Style="{StaticResource CaptionTextBox}">
+                             配色地狱
+                            </TextBlock>
+                        </StackPanel>
+                        <Slider Value="{Binding StrokeWidth,Mode=TwoWay}" 
+                            TickFrequency="0.01" IsSnapToTickEnabled="True"
+                            Maximum="3" Minimum="0"></Slider>
+
+                        <Rectangle Style="{StaticResource HorizonSplitLine}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource BodyTextBox}">填充颜色</TextBlock>
                             <TextBlock Style="{StaticResource CaptionTextBox}">
                                纯色绳索
                             </TextBlock>
                         </StackPanel>
                         <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button>打开取色对话框</Button>
+                            <Border Grid.Column="2" Style="{StaticResource ControlBorder}" Padding="0">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding RopeColor,Mode=OneWay}"/>
+                                </Border.Background>
+                            </Border>
                         </Grid>
 
                         <Rectangle Style="{StaticResource HorizonSplitLine}"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource BodyTextBox}">阻尼残数</TextBlock>
+                            <TextBlock Style="{StaticResource BodyTextBox}">描边颜色</TextBlock>
                             <TextBlock Style="{StaticResource CaptionTextBox}">
-                值越大绳子速度积累受到阻尼越小，1则为无阻尼
+                               纯色描边
                             </TextBlock>
                         </StackPanel>
-                        <Slider Value="{Binding Gravity,Mode=TwoWay}" 
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button>打开取色对话框</Button>
+                            <Border Grid.Column="2" Style="{StaticResource ControlBorder}" Padding="0">
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding StrokeColor,Mode=OneWay}"/>
+                                </Border.Background>
+                            </Border>
+                        </Grid>
+
+                        <Rectangle Style="{StaticResource HorizonSplitLine}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource BodyTextBox}">图片偏移X</TextBlock>
+                            <TextBlock Style="{StaticResource CaptionTextBox}">
+                              用于偏移图片悬挂点，同时会偏移旋转中心，需要将预期悬挂点与绳尾对其
+                            </TextBlock>
+                        </StackPanel>
+                        <Slider Value="{Binding ImgTransOffset_X,Mode=TwoWay}" 
+                             TickFrequency="0.1" IsSnapToTickEnabled="True"
+                             Maximum="1" Minimum="0.1"></Slider>
+
+                        <Rectangle Style="{StaticResource HorizonSplitLine}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource BodyTextBox}">图片偏移Y</TextBlock>
+                            <TextBlock Style="{StaticResource CaptionTextBox}">
+                              Y向上偏移，旋转同步绳子，向下偏移，悬挂感更强
+                            </TextBlock>
+                        </StackPanel>
+                        <Slider Value="{Binding ImgTransOffset_Y,Mode=TwoWay}" 
                 TickFrequency="0.1" IsSnapToTickEnabled="True"
                 Maximum="1" Minimum="0.1"></Slider>
 
                         <Rectangle Style="{StaticResource HorizonSplitLine}"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource BodyTextBox}">末端质量系数</TextBlock>
+                            <TextBlock Style="{StaticResource BodyTextBox}">角度偏移</TextBlock>
                             <TextBlock Style="{StaticResource CaptionTextBox}">
-                值越大末端节点惯性越大，对鼠标移动反映越激烈
+                             图片旋转将具有初始角
                             </TextBlock>
                         </StackPanel>
-                        <Slider Value="{Binding Gravity,Mode=TwoWay}" 
-                TickFrequency="0.1" IsSnapToTickEnabled="True"
+                        <Slider Value="{Binding ImgAngleOffset,Mode=TwoWay}" 
+                TickFrequency="1" IsSnapToTickEnabled="True"
+                Maximum="360" Minimum="0"></Slider>
+
+                        <Rectangle Style="{StaticResource HorizonSplitLine}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource BodyTextBox}">图片缩放</TextBlock>
+                            <TextBlock Style="{StaticResource CaptionTextBox}">
+                            图片大小缩放，建议先在PS缩小图片分辨率，此处仅用于微调且不允许放大
+                            </TextBlock>
+                        </StackPanel>
+                        <Slider Value="{Binding ImgScale,Mode=TwoWay}" 
+                TickFrequency="0.01" IsSnapToTickEnabled="True"
                 Maximum="1" Minimum="0.1"></Slider>
 
                         <Rectangle Style="{StaticResource HorizonSplitLine}"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource BodyTextBox}">迭代次数</TextBlock>
+                            <TextBlock Style="{StaticResource BodyTextBox}">光标偏移X</TextBlock>
                             <TextBlock Style="{StaticResource CaptionTextBox}">
-                值越大弹性损耗越小，越小则越松弛，通常5-15
+                            调整绳头与光标预期位置对齐，光标移动应与鼠标同步
                             </TextBlock>
                         </StackPanel>
-                        <Slider Value="{Binding Gravity,Mode=TwoWay}" 
-                TickFrequency="1" IsSnapToTickEnabled="True"
-                Maximum="25" Minimum="1"></Slider>
+                        <Slider Value="{Binding CursorOffset_X,Mode=TwoWay}" 
+                TickFrequency="0.01" IsSnapToTickEnabled="True"
+                Maximum="1" Minimum="0.1"></Slider>
 
                         <Rectangle Style="{StaticResource HorizonSplitLine}"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource BodyTextBox}">链节长度</TextBlock>
+                            <TextBlock Style="{StaticResource BodyTextBox}">光标偏移Y</TextBlock>
                             <TextBlock Style="{StaticResource CaptionTextBox}">
-                绳子模拟分辨率
+                            若不同步说明有DPI缩放问题，属于代码问题，臭了
                             </TextBlock>
                         </StackPanel>
-                        <Slider Value="{Binding Gravity,Mode=TwoWay}" 
-                TickFrequency="1" IsSnapToTickEnabled="True"
-                Maximum="20" Minimum="1"></Slider>
+                        <Slider Value="{Binding CursorOffset_Y,Mode=TwoWay}" 
+                TickFrequency="0.01" IsSnapToTickEnabled="True"
+                Maximum="1" Minimum="0.1"></Slider>
                     </StackPanel>
                 </Border>
+                <Expander Margin="0,0,0,16">
+                    <Expander.Header>
+                        <TextBlock Margin="5,0" Style="{StaticResource BodyTextBox}">关于</TextBlock>
+                    </Expander.Header>
+                </Expander>
             </StackPanel>
+
         </ScrollViewer>
 
 
@@ -232,9 +339,11 @@
                     <TextBlock Style="{StaticResource SubtitleTextBlock}" Text="实时预览" />
                     <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" VerticalAlignment="Bottom" Margin="16,0,6,0" Text="FPS:"/>
                     <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" VerticalAlignment="Bottom" />
-                    <TextBlock Style="{StaticResource CaptionTextBox}" FontWeight="Normal" VerticalAlignment="Bottom" Margin="16,0,6,0" Text="由于预览和实际绘制两个线程的冲突，统计值可能略低于真实值"/>
+                    <TextBlock Style="{StaticResource CaptionTextBox}" FontWeight="Normal" VerticalAlignment="Bottom" Margin="16,0,6,0" Text="预览刷新率略低"/>
                 </StackPanel>
                 <Border Style="{StaticResource ControlBorder}" Grid.Row="1" Margin="0,16,0,0" x:Name="ShowCanvas" />
+
+
             </Grid>
         </Border>
     </Grid>
