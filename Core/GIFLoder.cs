@@ -49,7 +49,7 @@ namespace CursorTail.Core
                 string[] stats = Enum.GetNames(typeof(States));
                 for (int i = 0; i < stats.Length; i++)
                 {
-                    var currentDir = Path.Combine(AppContext.BaseDirectory, "GIFs\\"+gifFonder+"\\"+stats[i]);
+                    var currentDir = Path.Combine(AppContext.BaseDirectory, "GIFs\\" + gifFonder + "\\" + stats[i]);
                     if (!Directory.Exists(currentDir) || Directory.GetFiles(currentDir).Length == 0)
                     {
                         if (i == 0)
@@ -62,6 +62,7 @@ namespace CursorTail.Core
                     else
                     {
                         imgPath[i] = Directory.GetFiles(currentDir);
+                        Array.Sort(imgPath[i], new NatureSortCompare());
                         _bitmapSources[i] = new BitmapSource[imgPath[i].Length];
                         for (int j = 0; j < imgPath[i].Length; j++)
                         {
@@ -122,6 +123,43 @@ namespace CursorTail.Core
         public void RaiseStateKeep()
         {
             _loopCount = 0;
+        }
+        private class NatureSortCompare : IComparer<string>
+        {
+            public int Compare(string? a, string? b)
+            {
+                //a、b都是格式化的文件名
+                //从第一个数字进行累计，直到出现第一个不同的数字列或字符
+                //此处提供两个变量实际是为了方便独立遍历
+                for (int x = 0, y = 0; x < a.Length && y < b.Length; x++, y++)
+                {
+                    if (char.IsDigit(a[x]) && char.IsDigit(b[y]))
+                    {
+                        long vx = 0, vy = 0;
+                        //每次迭代为数字进位，即*10
+                        for (; x < a.Length; x++)
+                        {
+                            vx = vx * 10 + (a[x] - '0');
+                        }
+                        for (; y < b.Length; y++)
+                        {
+                            vy = vy * 10 + (b[y] - '0');
+                        }
+                        //仅不相等时返回
+                        if (vx != vy)
+                        {
+                            return vx > vy ? 1 : -1;
+                        }
+                    }
+
+                    //对于非字母情况使用unicode码表排序
+                    if (x < a.Length && y < b.Length && a[x] != b[y])
+                    {
+                        return a[x] > b[y] ? 1 : -1;
+                    }
+                }
+                return 0;
+            }
         }
     }
 }

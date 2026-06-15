@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -66,14 +67,14 @@ namespace CursorTail.Core
             {
                 fpsTimer.Stop();
                 fpsTimer = null;
-                viewModel.RM?.SaveConfigs();
+                viewModel.SaveConfig();
                 CompositionTarget.Rendering -= UpdatePreview;
                 _visualBrush = null;
             };
             BindingEvents();
             LoadGifFolders();
         }
-
+        
         private void LoadGifFolders()
         {
             string[] folders= Directory.GetDirectories(System.IO.Path.Combine(AppContext.BaseDirectory, "GIFs"))
@@ -190,5 +191,13 @@ namespace CursorTail.Core
             }
         }
 
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            e.Handled = true;
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true,
+            });
+        }
     }
 }

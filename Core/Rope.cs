@@ -82,7 +82,7 @@ namespace CursorTail.Core
                         {
                             _stateMachine.SwitchTo(States.FastMoved);
                         }
-                        else if (v <= 5)
+                        else if (v <= 3)
                         {
                             _stateMachine.SwitchTo(States.Stopped);
                         }

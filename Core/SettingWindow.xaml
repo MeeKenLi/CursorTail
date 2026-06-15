@@ -451,7 +451,7 @@
                 </Border>
 
 
-                <Border Style="{StaticResource ControlBorder}" Margin="0,16">
+                <Border Style="{StaticResource ControlBorder}" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Style="{StaticResource SubtitleTextBlock}" Text="拖尾绘制参数" />
 
@@ -581,6 +581,22 @@
                     <Expander.Header>
                         <TextBlock Margin="5,0" Style="{StaticResource BodyTextBox}">关于</TextBlock>
                     </Expander.Header>
+                    <Expander.Content>
+                        <StackPanel>
+                            <TextBlock Margin="8,4"  Style="{StaticResource BodyTextBox}">
+                                    <Run>创意授权：</Run>
+                                    <Hyperlink FontWeight="Normal" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://space.bilibili.com/400839602">@普通的线框</Hyperlink>
+                            </TextBlock>
+                            <TextBlock Margin="8,4" Style="{StaticResource BodyTextBox}">
+                                    <Run>程序设计：</Run>
+                                    <Hyperlink FontWeight="Normal" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://space.bilibili.com/381983178">@MeeKenLi</Hyperlink>
+                            </TextBlock>
+                            <TextBlock Margin="8,4" Style="{StaticResource BodyTextBox}">
+                                    <Run>项目仓库：</Run>
+                                    <Hyperlink FontWeight="Normal" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/MeeKenLi/CursorTail">https://github.com/MeeKenLi/CursorTail</Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </Expander.Content>
                 </Expander>
             </StackPanel>
 

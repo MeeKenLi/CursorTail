@@ -35,6 +35,7 @@ namespace CursorTail.Core
         public GIFLoder gifLoder;
         private readonly string SavePath = Path.Combine(AppContext.BaseDirectory, "Config.txt");
 
+        public void SaveConfig() => RM.SaveConfigs(SavePath);
         public MainWindowViewModel(Rope rope, PainterVisionHost painter, FrameController frameController, GIFLoder gifLoder)
         {
             this.rope = rope;

@@ -49,6 +49,8 @@ namespace CursorTail
             rope = new Rope(new Vector2((float)SystemParameters.PrimaryScreenWidth, (float)SystemParameters.PrimaryScreenHeight), stateMachine);
             this.Width = SystemParameters.PrimaryScreenWidth;
             this.Height = SystemParameters.PrimaryScreenHeight;
+            this.WindowState = WindowState.Normal;
+            Top = 0; Left = 0;
             gifLoder = new(stateMachine, 4, "Hachimi");
             painter = new PainterVisionHost(rope, Color.FromRgb(255, 255, 0), Color.FromRgb(0, 0, 0), new Point(0, 0), 0, gifLoder);
             MainCanvas.Children.Add(painter);
@@ -56,6 +58,7 @@ namespace CursorTail
             ViewModel = new MainWindowViewModel(rope, painter, frameController, gifLoder);
             //CompositionTarget.Rendering += (s,e)=> frameController.UpdateFrame();
             LoadTaskIcon();
+            LoadReTopFC();
             DispatcherTimer timer = new DispatcherTimer(TimeSpan.FromMicroseconds(6), DispatcherPriority.Render, (s, e) => frameController.UpdateFrame(), Dispatcher);
         }
 
@@ -136,6 +139,16 @@ namespace CursorTail
                     _settingWindow.Close();
                 }
             };
+        }
+
+        private void LoadReTopFC()
+        {
+            FrameController fc = new FrameController(() =>
+            {
+                this.Topmost = false;
+                this.Topmost = true;
+            }, 2);
+            frameController.UpdatePerFrame += fc.UpdateFrame;
         }
     }
 }
