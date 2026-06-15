@@ -132,18 +132,22 @@ namespace CursorTail.Core
                     _imgFlip.ScaleY = 1;
                 }
             }
+            else
+            {
+                _imgFlip.ScaleY = 1;
+            }
 
             //旋转：旋转中心+角度偏移
             _imgRotate.CenterX = _imgFlip.CenterX = ropeNodes[secondLastIndex + 1].X;
             _imgRotate.CenterY = _imgFlip.CenterY = ropeNodes[secondLastIndex + 1].Y;
             if (A2B.Y < 0.001f && A2B.Y > 0 || A2B.Y > -0.001f && A2B.Y < 0)
             {
-                _imgRotate.Angle = 90 * (A2B.X > 0 ? 1 : -1) + ImgAngleOffset;
+                _imgRotate.Angle = 90 * (A2B.X >= 0 ? 1 : -1) + ImgAngleOffset;
             }
             else
             {
                 _imgRotate.Angle = Math.Atan(A2B.X / A2B.Y) * at + ImgAngleOffset;
-                if (A2B.Y < 0)
+                if (A2B.Y < -0.001)
                 {
                     _imgRotate.Angle += 180;
                 }

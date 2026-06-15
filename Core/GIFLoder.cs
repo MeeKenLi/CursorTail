@@ -43,12 +43,13 @@ namespace CursorTail.Core
             try
             {
                 string[][] imgPath = new string[4][];
+                var temp = _bitmapSources;
                 _bitmapSources = new BitmapSource[4][];
 
                 string[] stats = Enum.GetNames(typeof(States));
                 for (int i = 0; i < stats.Length; i++)
                 {
-                    var currentDir = Path.Combine(gifFonder, stats[i]);
+                    var currentDir = Path.Combine(AppContext.BaseDirectory, "GIFs\\"+gifFonder+"\\"+stats[i]);
                     if (!Directory.Exists(currentDir) || Directory.GetFiles(currentDir).Length == 0)
                     {
                         if (i == 0)
@@ -56,27 +57,33 @@ namespace CursorTail.Core
                             throw new Exception("Can't find any image.");
                         }
                         imgPath[i] = imgPath[0];
+                        _bitmapSources[i] = _bitmapSources[0];
                     }
-                    imgPath[i] = Directory.GetFiles(currentDir);
-                    //Array.Sort(imgPath[i], StrCmpLogicalW);
-                    _bitmapSources[i] = new BitmapSource[imgPath[i].Length];
-                }
-                for (int i = 0; i < 4; i++)
-                {
-                    for (int j = 0; j < imgPath[i].Length; j++)
+                    else
                     {
-                        _bitmapSources[i][j] = new BitmapImage(new Uri(imgPath[i][j], UriKind.Absolute));
+                        imgPath[i] = Directory.GetFiles(currentDir);
+                        _bitmapSources[i] = new BitmapSource[imgPath[i].Length];
+                        for (int j = 0; j < imgPath[i].Length; j++)
+                        {
+                            _bitmapSources[i][j] = new BitmapImage(new Uri(imgPath[i][j], UriKind.Absolute))
+                            {
+                                CacheOption = BitmapCacheOption.OnLoad
+                            };
+                        }
                     }
+                    //Array.Sort(imgPath[i], StrCmpLogicalW);
                 }
+                RaiseStateChange(States.Stopped);
+                _stateMachine.SwitchTo(States.Stopped);
             }
             catch (Exception e)
             {
-                var defaultPath = Path.Combine(AppContext.BaseDirectory, "GIFs\\Hachimi");
+                var defaultPath = "Hachimi";
                 if (GifFolder != defaultPath)
                 {
-                    MessageBox.Show("Gif文件夹格式错误，尝试加载示例文件夹，请参照示例文件结构。\n需要保证至少有Stoped文件夹即至少一个图片", "错误", MessageBoxButtons.OK);
                     GifFolder = defaultPath;
                     LoadAllImgs(GifFolder);
+                    MessageBox.Show("Gif文件夹格式错误，尝试加载示例文件夹，请参照示例文件结构。\n需要保证至少有Stoped文件夹即至少一个图片", "错误", MessageBoxButtons.OK);
                     return false;
                 }
                 else

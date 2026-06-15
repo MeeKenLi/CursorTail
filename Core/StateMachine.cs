@@ -7,7 +7,7 @@ namespace CursorTail.Core
 {
     public enum States
     {
-        Stoped,
+        Stopped,
         SlowMoved,
         FastMoved,
         Collided,
@@ -31,8 +31,8 @@ namespace CursorTail.Core
         }
         public void ResetState()
         {
-            RaiseStateChange?.Invoke(States.Stoped);
-            CurrentState = States.Stoped;
+            RaiseStateChange?.Invoke(States.Stopped);
+            CurrentState = States.Stopped;
         }
         public void SwitchTo(States state)
         {
@@ -43,7 +43,7 @@ namespace CursorTail.Core
                 RaiseStateChange?.Invoke(state);
                 CurrentState = state;
             }
-            else if (CurrentState != States.Stoped && CurrentState == state)
+            else if (CurrentState != States.Stopped && CurrentState == state)
             {
                 //处于state，状态保持
                 RaiseStateKeep?.Invoke();

@@ -1,43 +1,43 @@
 .Gravity
 {
 	type="System.Single"
-	value="0"
+	value="-0.11"
 	valueDescription=""
 }
 .Stiffness
 {
 	type="System.Single"
-	value="0.11"
+	value="1"
 	valueDescription=""
 }
 .Damp
 {
 	type="System.Single"
-	value="0.72"
+	value="0.98"
 	valueDescription=""
 }
 .Mass
 {
 	type="System.Single"
-	value="0.63"
+	value="0.71"
 	valueDescription=""
 }
 .Iterations
 {
 	type="System.Int32"
-	value="1"
+	value="7"
 	valueDescription=""
 }
 .NodeLength
 {
 	type="System.Int32"
-	value="2"
+	value="10"
 	valueDescription=""
 }
 .NodeNums
 {
 	type="System.Int32"
-	value="5"
+	value="6"
 	valueDescription=""
 }
 .TargetFPS
@@ -61,19 +61,19 @@
 .FastVelocity
 {
 	type="System.Int32"
-	value="15"
+	value="40"
 	valueDescription=""
 }
 .RopeWidth
 {
 	type="System.Double"
-	value="0"
+	value="1.6"
 	valueDescription=""
 }
 .StrokeWidth
 {
 	type="System.Double"
-	value="0"
+	value="0.91"
 	valueDescription=""
 }
 .ImgTransOffset_X
@@ -91,43 +91,43 @@
 .ImgAngleOffset
 {
 	type="System.Double"
-	value="-90"
+	value="180"
 	valueDescription=""
 }
 .ImgScale
 {
 	type="System.Double"
-	value="0.5"
+	value="0.85"
 	valueDescription=""
 }
 .CursorOffset_X
 {
 	type="System.Double"
-	value="9"
+	value="5.480000000000004"
 	valueDescription=""
 }
 .CursorOffset_Y
 {
 	type="System.Double"
-	value="5"
+	value="8.75"
 	valueDescription=""
 }
 .GifFolder
 {
 	type="System.String"
-	value="D:\Learn\Useful C3\CursorTail\bin\Debug\net10.0-windows7.0\GIFs\Hachimi"
+	value="云朵气球"
 	valueDescription=""
 }
 .RopeColor
 {
 	type="System.String"
-	value="255,255,0,0"
+	value="255,176,217,253"
 	valueDescription=""
 }
 .StrokeColor
 {
 	type="System.String"
-	value="255,0,0,0"
+	value="255,1,64,141"
 	valueDescription=""
 }
 .IsFlipGIF
@@ -139,6 +139,6 @@
 .IsFollowMode
 {
 	type="System.Boolean"
-	value="True"
+	value="False"
 	valueDescription=""
 }

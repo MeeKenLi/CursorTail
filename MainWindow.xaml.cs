@@ -49,7 +49,7 @@ namespace CursorTail
             rope = new Rope(new Vector2((float)SystemParameters.PrimaryScreenWidth, (float)SystemParameters.PrimaryScreenHeight), stateMachine);
             this.Width = SystemParameters.PrimaryScreenWidth;
             this.Height = SystemParameters.PrimaryScreenHeight;
-            gifLoder = new(stateMachine, 4, System.IO.Path.Combine(AppContext.BaseDirectory, "GIFs\\Hachimi"));
+            gifLoder = new(stateMachine, 4, "Hachimi");
             painter = new PainterVisionHost(rope, Color.FromRgb(255, 255, 0), Color.FromRgb(0, 0, 0), new Point(0, 0), 0, gifLoder);
             MainCanvas.Children.Add(painter);
             frameController = new FrameController(UpdatePerFrame, 60);

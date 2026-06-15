@@ -1,0 +1,144 @@
+.Gravity
+{
+	type="System.Single"
+	value="0.5"
+	valueDescription=""
+}
+.Stiffness
+{
+	type="System.Single"
+	value="1"
+	valueDescription=""
+}
+.Damp
+{
+	type="System.Single"
+	value="0.98"
+	valueDescription=""
+}
+.Mass
+{
+	type="System.Single"
+	value="0.5"
+	valueDescription=""
+}
+.Iterations
+{
+	type="System.Int32"
+	value="9"
+	valueDescription=""
+}
+.NodeLength
+{
+	type="System.Int32"
+	value="8"
+	valueDescription=""
+}
+.NodeNums
+{
+	type="System.Int32"
+	value="10"
+	valueDescription=""
+}
+.TargetFPS
+{
+	type="System.Int32"
+	value="60"
+	valueDescription=""
+}
+.GIFPS
+{
+	type="System.Int32"
+	value="10"
+	valueDescription=""
+}
+.GIFMaxLoop
+{
+	type="System.Int32"
+	value="2"
+	valueDescription=""
+}
+.FastVelocity
+{
+	type="System.Int32"
+	value="40"
+	valueDescription=""
+}
+.RopeWidth
+{
+	type="System.Double"
+	value="2"
+	valueDescription=""
+}
+.StrokeWidth
+{
+	type="System.Double"
+	value="0.5"
+	valueDescription=""
+}
+.ImgTransOffset_X
+{
+	type="System.Double"
+	value="0"
+	valueDescription=""
+}
+.ImgTransOffset_Y
+{
+	type="System.Double"
+	value="0"
+	valueDescription=""
+}
+.ImgAngleOffset
+{
+	type="System.Double"
+	value="0"
+	valueDescription=""
+}
+.ImgScale
+{
+	type="System.Double"
+	value="0.5"
+	valueDescription=""
+}
+.CursorOffset_X
+{
+	type="System.Double"
+	value="8.299999999999997"
+	valueDescription=""
+}
+.CursorOffset_Y
+{
+	type="System.Double"
+	value="16.019999999999996"
+	valueDescription=""
+}
+.GifFolder
+{
+	type="System.String"
+	value="Hachimi"
+	valueDescription=""
+}
+.RopeColor
+{
+	type="System.String"
+	value="255,217,175,66"
+	valueDescription=""
+}
+.StrokeColor
+{
+	type="System.String"
+	value="255,125,99,28"
+	valueDescription=""
+}
+.IsFlipGIF
+{
+	type="System.Boolean"
+	value="False"
+	valueDescription=""
+}
+.IsFollowMode
+{
+	type="System.Boolean"
+	value="False"
+	valueDescription=""
+}

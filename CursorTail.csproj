@@ -11,6 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="GIFs\Hachimi\Stoped\**" />
+    <EmbeddedResource Remove="GIFs\Hachimi\Stoped\**" />
+    <None Remove="GIFs\Hachimi\Stoped\**" />
+    <Page Remove="GIFs\Hachimi\Stoped\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Core\ConfigRecorder.dll" />
     <None Remove="GIFs\Hachimi\Collided\1.png" />
     <None Remove="GIFs\Hachimi\Collided\2.png" />
@@ -29,15 +36,15 @@
     <None Remove="GIFs\Hachimi\SlowMoved\2.png" />
     <None Remove="GIFs\Hachimi\SlowMoved\3.png" />
     <None Remove="GIFs\Hachimi\SlowMoved\4.png" />
-    <None Remove="GIFs\Hachimi\Stoped\1.png" />
-    <None Remove="GIFs\Hachimi\Stoped\2.png" />
-    <None Remove="GIFs\Hachimi\Stoped\3.png" />
-    <None Remove="GIFs\Hachimi\Stoped\4.png" />
-    <None Remove="GIFs\Hachimi\Stoped\5.png" />
-    <None Remove="GIFs\Hachimi\Stoped\6.png" />
-    <None Remove="GIFs\Hachimi\Stoped\7.png" />
-    <None Remove="GIFs\Hachimi\Stoped\8.png" />
-    <None Remove="GIFs\Hachimi\Stoped\9.png" />
+    <None Remove="GIFs\Hachimi\Stopped\1.png" />
+    <None Remove="GIFs\Hachimi\Stopped\2.png" />
+    <None Remove="GIFs\Hachimi\Stopped\3.png" />
+    <None Remove="GIFs\Hachimi\Stopped\4.png" />
+    <None Remove="GIFs\Hachimi\Stopped\5.png" />
+    <None Remove="GIFs\Hachimi\Stopped\6.png" />
+    <None Remove="GIFs\Hachimi\Stopped\7.png" />
+    <None Remove="GIFs\Hachimi\Stopped\8.png" />
+    <None Remove="GIFs\Hachimi\Stopped\9.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,31 +108,31 @@
     <Content Include="GIFs\Hachimi\FastMoved\4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\1.png">
+    <Content Include="GIFs\Hachimi\Stopped\1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\2.png">
+    <Content Include="GIFs\Hachimi\Stopped\2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\3.png">
+    <Content Include="GIFs\Hachimi\Stopped\3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\4.png">
+    <Content Include="GIFs\Hachimi\Stopped\4.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\5.png">
+    <Content Include="GIFs\Hachimi\Stopped\5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\6.png">
+    <Content Include="GIFs\Hachimi\Stopped\6.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\7.png">
+    <Content Include="GIFs\Hachimi\Stopped\7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\8.png">
+    <Content Include="GIFs\Hachimi\Stopped\8.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\Hachimi\Stoped\9.png">
+    <Content Include="GIFs\Hachimi\Stopped\9.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -138,13 +145,36 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Configs\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="ConfigRecorder">
       <HintPath>Core\ConfigRecorder.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Configs\云朵气球静态示例参数.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Configs\基米挂坠默认参数.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Configs\基米跟随示例参数.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Configs\贝黑莱特静态示例参数.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GIFs\云朵气球\Stopped\云朵气球.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GIFs\卡兹\Stopped\卡兹.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GIFs\贝黑莱特\Stopped\贝黑莱特.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="GIFs\钓竿\Stopped\钓竿.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

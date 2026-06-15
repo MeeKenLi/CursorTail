@@ -97,11 +97,11 @@ namespace CursorTail.Core
             RM.RC.Add(new(typeof(double), "ImgScale", 0.5));
             RM.RC.Add(new(typeof(double), "CursorOffset_X", 9));
             RM.RC.Add(new(typeof(double), "CursorOffset_Y", 5));
-            RM.RC.Add(new(typeof(string), "GifFolder", Path.Combine(AppContext.BaseDirectory, "GIFs\\Hachimi")));
-            RM.RC.Add(new(typeof(string), "RopeColor", "255,255,0,0"));
-            RM.RC.Add(new(typeof(string), "StrokeColor", "255,0,0,0"));
+            RM.RC.Add(new(typeof(string), "GifFolder", "Hachimi"));
+            RM.RC.Add(new(typeof(string), "RopeColor", "255,217,175,66"));
+            RM.RC.Add(new(typeof(string), "StrokeColor", "255,156,123,35"));
             RM.RC.Add(new(typeof(bool), "IsFlipGIF", false));
-            RM.RC.Add(new(typeof(bool), "IsFollowMode", true));
+            RM.RC.Add(new(typeof(bool), "IsFollowMode", false));
 
         }
         public void ReadProps()
@@ -159,6 +159,7 @@ namespace CursorTail.Core
                     gifLoder.LoadAllImgs(value);
                     RaisePropertyChanged();
                     RecordPropChanged(gifLoder.GifFolder);
+                    painter.ResetGeometryProps();
                 }
             }
         }
@@ -516,5 +517,17 @@ namespace CursorTail.Core
                 }
             }
         }
+
+        private string[] _gifFolders;
+        public string[] GifFolders
+        {
+            get => _gifFolders;
+            set
+            {
+                _gifFolders = value;
+                RaisePropertyChanged();
+            }
+        }
+
     }
 }

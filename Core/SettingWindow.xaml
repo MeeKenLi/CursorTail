@@ -99,15 +99,7 @@
                                     GIF拆成可排序的图片序列，只需保证至少有Stoped文件夹，且有一个图片，即无其他状态的纯静态图
                                     </TextBlock>
                                 </StackPanel>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="12"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0" FontSize="12" IsReadOnly="True" Text="{Binding GifFolder}"></TextBox>
-                                    <Button x:Name="LoadGIFButton" Grid.Column="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">加载</Button>
-                                </Grid>
+                                <ComboBox x:Name="GifFolderComBox" SelectedValue="{Binding GifFolder,Mode=TwoWay}" ItemsSource="{Binding GifFolders,Mode=TwoWay}"></ComboBox>
                             </StackPanel>
 
                             <Rectangle Style="{StaticResource HorizonSplitLine}"/>

@@ -84,7 +84,7 @@ namespace CursorTail.Core
                         }
                         else if (v <= 5)
                         {
-                            _stateMachine.SwitchTo(States.Stoped);
+                            _stateMachine.SwitchTo(States.Stopped);
                         }
                         else
                         {

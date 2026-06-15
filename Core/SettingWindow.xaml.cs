@@ -71,8 +71,16 @@ namespace CursorTail.Core
                 _visualBrush = null;
             };
             BindingEvents();
+            LoadGifFolders();
         }
 
+        private void LoadGifFolders()
+        {
+            string[] folders= Directory.GetDirectories(System.IO.Path.Combine(AppContext.BaseDirectory, "GIFs"))
+                .Select((f) => (new DirectoryInfo(f)).Name).ToArray();
+            if(ViewModel.GifFolders==null ||ViewModel.GifFolders.Length!=folders.Length)
+                ViewModel.GifFolders=folders;
+        }
         private void BindingEvents()
         {
             CompositionTarget.Rendering += UpdatePreview;
@@ -80,7 +88,7 @@ namespace CursorTail.Core
             LoadConfigButton.Click += (s, e) => LoadConfigFile();
             SaveAsButton.Click += (s, e) => SaveConfigAs();
             ResetButton.Click += (s, e) => ViewModel.LoadProps();
-            LoadGIFButton.Click += (s, e) => LoadGifFolder();
+            GifFolderComBox.DropDownOpened += (s, e) => LoadGifFolders();
             RopeColorDia.Click += (s, e) => ViewModel.RopeColor = GetColor(ViewModel.RopeColor);
             StrokeColorDia.Click += (s, e) => ViewModel.StrokeColor = GetColor(ViewModel.StrokeColor);
             StartUpCheckBox.Click += (s, e) => SetStartUp();
@@ -137,18 +145,6 @@ namespace CursorTail.Core
                 return defaultColor;
             }
         }
-        private void LoadGifFolder()
-        {
-            OpenFolderDialog openFolder = new()
-            {
-                DefaultDirectory = System.IO.Path.Combine(AppContext.BaseDirectory, "GIFs"),
-                Title = "打开包含状态Gif文件夹的文件夹",
-                Multiselect = false
-            };
-            openFolder.ShowDialog();
-            ViewModel.GifFolder = openFolder.FolderName;
-        }
-
         private bool CheckStartUp(out bool isEnable)
         {
             using (RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
