@@ -153,13 +153,15 @@ namespace CursorTail.Core
                 }
             }
 
-
-            using (StreamGeometryContext sgc = _geometry.Open())
+            if (RopeWidth != 0 || StrokeWidth != 0)
             {
-                sgc.BeginFigure(ropeNodes[0], false, false);
-                for (int i = 1; i < ropeNodes.Length; i++)
+                using (StreamGeometryContext sgc = _geometry.Open())
                 {
-                    sgc.LineTo(ropeNodes[i], true, true);
+                    sgc.BeginFigure(ropeNodes[0], false, false);
+                    for (int i = 1; i < ropeNodes.Length; i++)
+                    {
+                        sgc.LineTo(ropeNodes[i], true, true);
+                    }
                 }
             }
         }
@@ -175,11 +177,14 @@ namespace CursorTail.Core
         {
             using (DrawingContext gdc = _geoVisual.RenderOpen())
             {
-                if (StrokeWidth >= 0)
+                if (StrokeWidth > 0)
                 {
                     gdc.DrawGeometry(null, _ropeStrokePen, _geometry);
                 }
-                gdc.DrawGeometry(null, _ropeFullPen, _geometry);
+                if (RopeWidth > 0)
+                {
+                    gdc.DrawGeometry(null, _ropeFullPen, _geometry);
+                }
             }
         }
 

@@ -142,12 +142,12 @@ namespace CursorTail.Core
                     //向量使用B-A 即从A指向B
                     Vector2 A2B;
                     A2B = _newNodes[i + 1] - _newNodes[i];
-                    var len_A2B = A2B.Length();
+                    float len_A2B = A2B.Length();
                     if (len_A2B < 0.001f)
                         continue;
-                    var dir_A2B = A2B / len_A2B;
+                    Vector2 dir_A2B = A2B / len_A2B;
                     //差值使用长减短(大多数情况)，当前长度-目标长度
-                    var difference = len_A2B - NodeLength;
+                    float difference = len_A2B - NodeLength;
                     //这样得到的差值向量则上加下减
                     var offset = difference * Stiffness * dir_A2B;
                     if (i == 0)

@@ -74,13 +74,13 @@ namespace CursorTail.Core
             BindingEvents();
             LoadGifFolders();
         }
-        
+
         private void LoadGifFolders()
         {
-            string[] folders= Directory.GetDirectories(System.IO.Path.Combine(AppContext.BaseDirectory, "GIFs"))
+            string[] folders = Directory.GetDirectories(System.IO.Path.Combine(AppContext.BaseDirectory, "GIFs"))
                 .Select((f) => (new DirectoryInfo(f)).Name).ToArray();
-            if(ViewModel.GifFolders==null ||ViewModel.GifFolders.Length!=folders.Length)
-                ViewModel.GifFolders=folders;
+            if (ViewModel.GifFolders == null || ViewModel.GifFolders.Length != folders.Length)
+                ViewModel.GifFolders = folders;
         }
         private void BindingEvents()
         {
@@ -158,7 +158,7 @@ namespace CursorTail.Core
                 isEnable = true;
                 string appPath = $"\"{System.Windows.Forms.Application.ExecutablePath}\"";
                 string appName = System.IO.Path.GetFileNameWithoutExtension(appPath);
-                return key.GetSubKeyNames().Contains(appName) && key.GetValue(appName) == appPath;
+                return key.GetValueNames().Contains(appName) && (string)key.GetValue(appName) == appPath;
             }
         }
         private bool SetStartUp()

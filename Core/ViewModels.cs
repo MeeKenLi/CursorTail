@@ -55,16 +55,26 @@ namespace CursorTail.Core
             }
             catch
             {
-                if (path != SavePath)
+                try
                 {
-                    System.Windows.MessageBox.Show("目标存档读取失败，检查文本格式，重载最新存档文件", "错误", MessageBoxButton.OK);
-                    LoadProps();
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("当前存档文件读取失败，重新创建默认参数并覆盖，\n！！！需要保存当前存档文件请在点击确认前创建副本！！！", "错误", MessageBoxButton.OK);
                     CreatRecords();
                     RM.SaveConfigs();
+                    System.Windows.MessageBox.Show("当前存档文件缺少参数，已使用默认值补充，记得覆盖Configs中的存档", "警告", MessageBoxButton.OK);
+                }
+                catch
+                {
+                    if (path != SavePath)
+                    {
+                        System.Windows.MessageBox.Show("目标存档读取失败，值类型有误或格式错误，重载最新存档文件", "错误", MessageBoxButton.OK);
+                        LoadProps();
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("当前存档文件格式错误，重新创建默认参数并覆盖，\n！！！需要保存当前存档文件请在点击确认前创建副本！！！", "错误", MessageBoxButton.OK);
+                        RM.RC.Clear();
+                        CreatRecords();
+                        RM.SaveConfigs();
+                    }
                 }
                 ConfigPath = SavePath;
             }
@@ -78,7 +88,6 @@ namespace CursorTail.Core
 
         public void CreatRecords()
         {
-            RM.RC.Clear();
             RM.RC.Add(new(typeof(float), "Gravity", 1f));
             RM.RC.Add(new(typeof(float), "Stiffness", 1f));
             RM.RC.Add(new(typeof(float), "Damp", 1f));
@@ -255,14 +264,14 @@ namespace CursorTail.Core
             {
                 if (value < rope.NodeNums)
                 {
-                    for (int i = 0; i < rope.NodeNums - value; i++)
+                    while(value < rope.NodeNums)
                     {
                         rope.DeleteNode();
                     }
                 }
                 if (value > rope.NodeNums)
                 {
-                    for (int i = 0; i < value - rope.NodeNums; i++)
+                    while (value > rope.NodeNums)
                     {
                         rope.AddNode();
                     }
