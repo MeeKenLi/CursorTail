@@ -28,7 +28,7 @@ namespace CursorTail.Core
             set => _gifFC.TargetFrameTime = 1.0 / value * 1000;
         }
 
-        public GIFLoder(StateMachine stateMachine, int loopCount, string gifFolder, int targetFPS = 10)
+        public GIFLoder(StateMachine stateMachine, int loopCount, string gifFolder="", int targetFPS = 10)
         {
             _gifFC = new(GenerateToNextFrame, targetFPS);
             MaxLoopCount = loopCount;
@@ -36,7 +36,6 @@ namespace CursorTail.Core
             _stateMachine.RaiseStateChange += RaiseStateChange;
             _stateMachine.RaiseStateKeep += RaiseStateKeep;
             GifFolder = gifFolder;
-            LoadAllImgs(GifFolder);
         }
         public bool LoadAllImgs(string gifFonder)
         {
@@ -63,7 +62,7 @@ namespace CursorTail.Core
                     {
                         imgPath[i] = Directory.GetFiles(currentDir);
                         Array.Sort(imgPath[i], new NatureSortCompare());
-                        _bitmapSources[i] = new BitmapSource[imgPath[i].Length];
+                        _bitmapSources[i] = new BitmapSource[imgPath[i].Length] ;
                         for (int j = 0; j < imgPath[i].Length; j++)
                         {
                             _bitmapSources[i][j] = new BitmapImage(new Uri(imgPath[i][j], UriKind.Absolute))

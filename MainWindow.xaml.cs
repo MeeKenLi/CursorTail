@@ -22,6 +22,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
+using CL = CursorTail.Core.CursorLocation;
 
 namespace CursorTail
 {
@@ -34,6 +35,7 @@ namespace CursorTail
         public PainterVisionHost painter;
         public FrameController frameController;
         private DpiScale _dpiScale;
+        private System.Drawing.Rectangle[] _screens;
         public MainWindowViewModel ViewModel;
         public StateMachine stateMachine;
         public GIFLoder gifLoder;
@@ -41,48 +43,42 @@ namespace CursorTail
         {
             InitializeComponent();
             _dpiScale = VisualTreeHelper.GetDpi(this);
+            _screens = Screen.AllScreens.Select(s => s.WorkingArea).ToArray();
             SourceInitialized += OnSourceInitialized;
             this.SnapsToDevicePixels = true;
 
-            //临时测试部分
+            //实例化
             stateMachine = new();
-            rope = new Rope(new Vector2((float)SystemParameters.PrimaryScreenWidth, (float)SystemParameters.PrimaryScreenHeight), stateMachine);
-            this.Width = SystemParameters.PrimaryScreenWidth;
-            this.Height = SystemParameters.PrimaryScreenHeight;
+            rope = new Rope(stateMachine);
+            //绑定鼠标跨屏事件
+            CL.RaiseDeskTopChange += (System.Drawing.Rectangle bound) =>
+            {
+                this.Top = bound.Top;
+                this.Left = bound.Left;
+                this.Width = bound.Width / _dpiScale.DpiScaleX;
+                this.Height = bound.Height / _dpiScale.DpiScaleY;
+                rope.CollideBox = new(0,0, (float)Width, (float)Height);
+            };
             this.WindowState = WindowState.Normal;
-            Top = 0; Left = 0;
-            gifLoder = new(stateMachine, 4, "Hachimi");
+            gifLoder = new(stateMachine, 4);
             painter = new PainterVisionHost(rope, Color.FromRgb(255, 255, 0), Color.FromRgb(0, 0, 0), new Point(0, 0), 0, gifLoder);
             MainCanvas.Children.Add(painter);
             frameController = new FrameController(UpdatePerFrame, 60);
             ViewModel = new MainWindowViewModel(rope, painter, frameController, gifLoder);
+
+            //绑定事件
             //CompositionTarget.Rendering += (s,e)=> frameController.UpdateFrame();
             LoadTaskIcon();
             LoadReTopFC();
             DispatcherTimer timer = new DispatcherTimer(TimeSpan.FromMicroseconds(6), DispatcherPriority.Render, (s, e) => frameController.UpdateFrame(), Dispatcher);
         }
 
-        System.Drawing.Point cursorPos = new(0, 0);
         private void UpdatePerFrame()
         {
-            PInvoke.GetCursorPos(out cursorPos);
-            rope.Update(new((float)(cursorPos.X / _dpiScale.DpiScaleX + ViewModel.CursorOffset_X), (float)(cursorPos.Y / _dpiScale.DpiScaleY + ViewModel.CursorOffset_Y)));
+            CL.FrushCursorPos(_dpiScale);
+            rope.Update(new(CL.RelatviCursorPos.X + ViewModel.CursorOffset_X, CL.RelatviCursorPos.Y + ViewModel.CursorOffset_Y));
             painter.Update();
         }
-
-        //private void UpdateWinPos(object? s, EventArgs? e)
-        //{
-        //    PInvoke.GetCursorPos(out cursorPos);
-        //    MoveWindow(cursorPos.X / _dpiScale.DpiScaleX, cursorPos.Y / _dpiScale.DpiScaleY);
-        //}
-
-        //private void MoveWindow(double x, double y)
-        //{
-        //    if (Left != x)
-        //        this.Left = x - this.ActualWidth / 2;
-        //    if (Top != y)
-        //        this.Top = y - this.ActualHeight / 2;
-        //}
 
         /// <summary>
         /// 源初始化完毕函数，在构造函数完成后运行，窗口已有句柄，此时定义鼠标穿透和工具窗口
@@ -111,7 +107,7 @@ namespace CursorTail
             {
                 if (_settingWindow == null)
                 {
-                    _settingWindow = new SettingWindow(ViewModel, painter, _dpiScale);
+                    _settingWindow = new SettingWindow(ViewModel, painter);
                     _settingWindow.Closed += (s, e) => _settingWindow = null;
                     _settingWindow.Show();
                 }
@@ -147,7 +143,10 @@ namespace CursorTail
             {
                 this.Topmost = false;
                 this.Topmost = true;
-            }, 2);
+            })
+            {
+                TargetFrameTime = 10 * 1000,
+            };
             frameController.UpdatePerFrame += fc.UpdateFrame;
         }
     }

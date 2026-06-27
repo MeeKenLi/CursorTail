@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Windows.Win32;
 using Color = System.Windows.Media.Color;
+using CL = CursorTail.Core.CursorLocation;
 
 namespace CursorTail.Core
 {
@@ -46,11 +47,9 @@ namespace CursorTail.Core
     {
         public MainWindowViewModel ViewModel { get; set; }
         private VisualBrush? _visualBrush;
-        private DpiScale _dpiScale;
-        public SettingWindow(MainWindowViewModel viewModel, PainterVisionHost painter, DpiScale dpiScale)
+        public SettingWindow(MainWindowViewModel viewModel, PainterVisionHost painter)
         {
             InitializeComponent();
-            _dpiScale = dpiScale;
             ViewModel = viewModel;
             DataContext = viewModel;
             ViewModel.IsStartUp = CheckStartUp(out bool IsEnabled);
@@ -121,12 +120,11 @@ namespace CursorTail.Core
             saveFile.ShowDialog();
             ViewModel.RM.SaveConfigs(saveFile.FileName);
         }
-        System.Drawing.Point _cursorPos = new(0, 0);
+
         private void UpdatePreview(object? s, EventArgs e)
         {
-            PInvoke.GetCursorPos(out _cursorPos);
-            _visualBrush.Viewbox = new Rect(_cursorPos.X / _dpiScale.DpiScaleX - ShowCanvas.ActualWidth / 2,
-                _cursorPos.Y / _dpiScale.DpiScaleY - ShowCanvas.ActualHeight / 2,
+            _visualBrush.Viewbox = new Rect(CL.RelatviCursorPos.X - ShowCanvas.ActualWidth / 2,
+                CL.RelatviCursorPos.Y - ShowCanvas.ActualHeight / 2,
                 ShowCanvas.ActualWidth, ShowCanvas.ActualHeight);
         }
 

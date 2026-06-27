@@ -109,7 +109,6 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock></TextBlock>
 
                                 <StackPanel Orientation="Horizontal" >
                                     <TextBlock Style="{StaticResource BodyTextBox}">开机自启动</TextBlock>
@@ -118,9 +117,9 @@
                                     </TextBlock>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                    <CheckBox x:Name="StartUpCheckBox" IsChecked="{Binding IsStartUp,Mode=TwoWay}" Margin="0,-10"/>
                                     <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal">自启动：</TextBlock>
                                     <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" Text="{Binding IsStartUp}" Grid.Column="1" HorizontalAlignment="Right"/>
+                                    <CheckBox x:Name="StartUpCheckBox" IsChecked="{Binding IsStartUp,Mode=TwoWay}" Margin="10,-10,-8,-10"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
@@ -457,27 +456,64 @@
 
                         <Rectangle Style="{StaticResource HorizonSplitLine}" Height="0"/>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource BodyTextBox}">跟随模式</TextBlock>
-                            <TextBlock Style="{StaticResource CaptionTextBox}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBlock Style="{StaticResource BodyTextBox}">跟随模式</TextBlock>
+                                <TextBlock Style="{StaticResource CaptionTextBox}">
                               跟随模式请保证分左右的Gif方向统一，此时拖尾将自动保持面向鼠标(需调节角度)
-                            </TextBlock>
-                        </StackPanel>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal">跟随模式：</TextBlock>
+                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" Text="{Binding IsFollowMode}" Grid.Column="1" HorizontalAlignment="Right"/>
+                                <CheckBox IsChecked="{Binding IsFollowMode,Mode=TwoWay}" Margin="10,-10,-8,-10"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Rectangle Style="{StaticResource HorizonSplitLine}"/>
 
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <CheckBox IsChecked="{Binding IsFollowMode,Mode=TwoWay}" Margin="10,0"/>
-                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal">启用跟随模式：</TextBlock>
-                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" Text="{Binding IsFollowMode}" Grid.Column="1" HorizontalAlignment="Right"/>
+
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBlock Style="{StaticResource BodyTextBox}">水平翻转</TextBlock>
+                                <TextBlock Style="{StaticResource CaptionTextBox}">
+                                  使用水平翻转可以随时更改Gif朝向，绘制时只需要保证Gif朝向一致
+                                </TextBlock>
                             </StackPanel>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                <CheckBox IsChecked="{Binding IsFlipGIF,Mode=TwoWay}" Margin="10,0"/>
-                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal">手动翻转一次Gif：</TextBlock>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal">翻转Gif：</TextBlock>
                                 <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" Text="{Binding IsFlipGIF}" Grid.Column="1" HorizontalAlignment="Right"/>
+                                <CheckBox IsChecked="{Binding IsFlipGIF,Mode=TwoWay}" Margin="10,-10,-8,-10"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Rectangle Style="{StaticResource HorizonSplitLine}"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal" >
+                                <TextBlock Style="{StaticResource BodyTextBox}">抗锯齿</TextBlock>
+                                <TextBlock Style="{StaticResource CaptionTextBox}">
+                              临近线性插值会使得图片模糊，关闭后图像更锐，像素风动图需要关闭此项，锯齿严重需启用
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal">抗锯齿：</TextBlock>
+                                <TextBlock Style="{StaticResource BodyTextBox}" FontWeight="Normal" Text="{Binding IsLinearRender}" Grid.Column="1" HorizontalAlignment="Right"/>
+                                <CheckBox IsChecked="{Binding IsLinearRender,Mode=TwoWay}" Margin="10,-10,-8,-10"/>
                             </StackPanel>
                         </Grid>
 

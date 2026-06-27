@@ -15,6 +15,7 @@ using Color = System.Windows.Media.Color;
 using Pen = System.Windows.Media.Pen;
 using Size = System.Windows.Size;
 using Windows.Win32;
+using System.Diagnostics;
 
 namespace CursorTail.Core
 {
@@ -32,6 +33,7 @@ namespace CursorTail.Core
         public double ImgAngleOffset;
         public double ImgScale;
         public bool IsFollowMode;
+        public bool IsLinearRender;
         public bool IsFlipGif;
 
         private StreamGeometry _geometry;
@@ -60,7 +62,7 @@ namespace CursorTail.Core
         protected override Visual GetVisualChild(int index) => _visuals[index];
 
         public PainterVisionHost(Rope rope, Color fill, Color stroke, Point imgOffset, double imgAngle, GIFLoder loder,
-            double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, bool isFollow = true, bool flipGif = false)
+            double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, bool isFollow = true, bool isLinear = true, bool flipGif = false)
         {
             //同步变量
             _rope = rope;
@@ -73,6 +75,7 @@ namespace CursorTail.Core
             ImgScale = scale;
             IsFollowMode = isFollow;
             IsFlipGif = flipGif;
+            IsLinearRender = isLinear;
             //实例化变量
             _geometry = new StreamGeometry();
             _geoVisual = new DrawingVisual();
@@ -88,11 +91,10 @@ namespace CursorTail.Core
             _imgTrans.Children.Add(_imgTranslate);
             _imgTrans.Children.Add(_imgFlip);
             _imgTrans.Children.Add(_imgRotate);
-
             _gifLoder = loder;
-            ResetGeometryProps();
         }
-
+        public void ReSetBitMapMode() =>
+            RenderOptions.SetBitmapScalingMode(_imgVisual, IsLinearRender ? BitmapScalingMode.Linear : BitmapScalingMode.NearestNeighbor);
         /// <summary>
         /// 该函数内仅发生Color、Width、Scale、变化时触发
         /// </summary>
@@ -118,7 +120,8 @@ namespace CursorTail.Core
             _imgRect = new Rect(ropeNodes[secondLastIndex + 1].X, ropeNodes[secondLastIndex + 1].Y, _rectScale.Width, _rectScale.Height);
 
             Vector2 A2B = _rope.GetNodeByIndex(secondLastIndex) - _rope.GetNodeByIndex(secondLastIndex + 1);
-            A2B *= new Vector2(1, -1);
+            A2B.Y *= -1;
+            A2B.Y += 0.0f;
             _imgFlip.ScaleX = IsFlipGif ? -1 : 1;
             //水平反转
             if (IsFollowMode)
@@ -140,14 +143,14 @@ namespace CursorTail.Core
             //旋转：旋转中心+角度偏移
             _imgRotate.CenterX = _imgFlip.CenterX = ropeNodes[secondLastIndex + 1].X;
             _imgRotate.CenterY = _imgFlip.CenterY = ropeNodes[secondLastIndex + 1].Y;
-            if (A2B.Y < 0.001f && A2B.Y > 0 || A2B.Y > -0.001f && A2B.Y < 0)
+            if (A2B.Y < 0.05f && A2B.Y > 0 || A2B.Y > -0.05f && A2B.Y < 0)
             {
                 _imgRotate.Angle = 90 * (A2B.X >= 0 ? 1 : -1) + ImgAngleOffset;
             }
             else
             {
-                _imgRotate.Angle = Math.Atan(A2B.X / A2B.Y) * at + ImgAngleOffset;
-                if (A2B.Y < -0.001)
+                _imgRotate.Angle = MathF.Atan(A2B.X / A2B.Y) * at + ImgAngleOffset;
+                if (A2B.Y < -0.05f)
                 {
                     _imgRotate.Angle += 180;
                 }

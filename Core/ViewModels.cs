@@ -58,8 +58,9 @@ namespace CursorTail.Core
                 try
                 {
                     CreatRecords();
-                    RM.SaveConfigs();
-                    System.Windows.MessageBox.Show("当前存档文件缺少参数，已使用默认值补充，记得覆盖Configs中的存档", "警告", MessageBoxButton.OK);
+                    SaveConfig();
+                    //RM.SaveConfigs();
+                    System.Windows.MessageBox.Show("当前存档文件缺少参数或参数类型改变，已使用默认值补充，记得覆盖Configs中的存档", "修正", MessageBoxButton.OK);
                 }
                 catch
                 {
@@ -105,17 +106,18 @@ namespace CursorTail.Core
             RM.RC.Add(new(typeof(double), "ImgTransOffset_Y", 0));
             RM.RC.Add(new(typeof(double), "ImgAngleOffset", 0));
             RM.RC.Add(new(typeof(double), "ImgScale", 0.5));
-            RM.RC.Add(new(typeof(double), "CursorOffset_X", 9));
-            RM.RC.Add(new(typeof(double), "CursorOffset_Y", 5));
+            RM.RC.Add(new(typeof(float), "CursorOffset_X", 9));
+            RM.RC.Add(new(typeof(float), "CursorOffset_Y", 5));
             RM.RC.Add(new(typeof(string), "GifFolder", "Hachimi"));
             RM.RC.Add(new(typeof(string), "RopeColor", "255,217,175,66"));
             RM.RC.Add(new(typeof(string), "StrokeColor", "255,156,123,35"));
             RM.RC.Add(new(typeof(bool), "IsFlipGIF", false));
             RM.RC.Add(new(typeof(bool), "IsFollowMode", false));
-
+            RM.RC.Add(new(typeof(bool), "IsLinearRender", true));
         }
         public void ReadProps()
         {
+            GifFolder = RM.RC["GifFolder"].GetValue(GifFolder);
             Gravity = RM.RC["Gravity"].GetValue(Gravity);
             Stiffness = RM.RC["Stiffness"].GetValue(Stiffness);
             Damp = RM.RC["Damp"].GetValue(Damp);
@@ -139,9 +141,9 @@ namespace CursorTail.Core
             TargetFPS = RM.RC["TargetFPS"].GetValue(TargetFPS);
             GIFPS = RM.RC["GIFPS"].GetValue(GIFPS);
             GIFMaxLoop = RM.RC["GIFMaxLoop"].GetValue(GIFMaxLoop);
-            GifFolder = RM.RC["GifFolder"].GetValue(GifFolder);
             IsFlipGIF = RM.RC["IsFlipGIF"].GetValue(IsFlipGIF);
             IsFollowMode = RM.RC["IsFollowMode"].GetValue(IsFollowMode);
+            IsLinearRender = RM.RC["IsLinearRender"].GetValue(IsLinearRender);
         }
 
         #region 属性声明
@@ -407,8 +409,8 @@ namespace CursorTail.Core
             }
         }
 
-        private double _cursorOffset_X;
-        public double CursorOffset_X
+        private float _cursorOffset_X;
+        public float CursorOffset_X
         {
             get => _cursorOffset_X;
             set
@@ -421,8 +423,8 @@ namespace CursorTail.Core
                 }
             }
         }
-        private double _cursorOffset_Y;
-        public double CursorOffset_Y
+        private float _cursorOffset_Y;
+        public float CursorOffset_Y
         {
             get => _cursorOffset_Y;
             set
@@ -498,6 +500,20 @@ namespace CursorTail.Core
                 if (painter.IsFollowMode != value)
                 {
                     painter.IsFollowMode = value;
+                    RaisePropertyChanged();
+                    RecordPropChanged(value);
+                }
+            }
+        }
+        public bool IsLinearRender
+        {
+            get => painter.IsLinearRender;
+            set
+            {
+                if (painter.IsLinearRender != value)
+                {
+                    painter.IsLinearRender = value;
+                    painter.ReSetBitMapMode();
                     RaisePropertyChanged();
                     RecordPropChanged(value);
                 }

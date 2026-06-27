@@ -15,7 +15,6 @@ namespace CursorTail.Core
 
         private List<Vector2> _oldNodes;
         private List<Vector2> _newNodes;
-        private Vector2 _oldCursorPos = new Vector2(0);
         public float Gravity;
         public float Stiffness;
         public float Damp;
@@ -23,7 +22,7 @@ namespace CursorTail.Core
         public int Iterations;
         public int NodeLength;
         public int NodeNums;
-        public Vector2 CollideBox;
+        public RectangleF CollideBox=new();
         public float CollideRadius;
         public int FastVelocity;
         //public Vector2 CenterPoint;
@@ -31,7 +30,6 @@ namespace CursorTail.Core
         public Point[] _dPoints;
 
         public Rope(
-            Vector2 collideBox,
             StateMachine stateMachine,
             float gravity = 0f,//0-2
             float stiffness = 1f,
@@ -52,7 +50,6 @@ namespace CursorTail.Core
             NodeNums = nodeNums;
             FastVelocity = fastVelocity;
             //CenterPoint = new Vector2((float)BoxSize/2);
-            CollideBox = collideBox;
             _stateMachine = stateMachine;
             _newNodes = new List<Vector2>();
             _oldNodes = new List<Vector2>();
@@ -96,25 +93,29 @@ namespace CursorTail.Core
                     //边界碰撞处理
                     bool isCrashed = false;
                     var Crashed = _newNodes[i];
-                    if (_newNodes[i].X < CollideRadius)
+                    var top = CollideBox.Top + CollideRadius;
+                    var buttom = CollideBox.Bottom - CollideRadius;
+                    var left = CollideBox.Left + CollideRadius;
+                    var right = CollideBox.Right - CollideRadius;
+                    if (_newNodes[i].X < left)
                     {
                         isCrashed = true;
-                        Crashed.X = CollideRadius;
+                        Crashed.X = left;
                     }
-                    if (_newNodes[i].Y < CollideRadius)
+                    if (_newNodes[i].Y < top)
                     {
                         isCrashed = true;
-                        Crashed.Y = CollideRadius;
+                        Crashed.Y = top;
                     }
-                    if (_newNodes[i].X > CollideBox.X - CollideRadius)
+                    if (_newNodes[i].X > right)
                     {
                         isCrashed = true;
-                        Crashed.X = CollideBox.X - CollideRadius;
+                        Crashed.X = right;
                     }
-                    if (_newNodes[i].Y > CollideBox.Y - CollideRadius)
+                    if (_newNodes[i].Y > buttom)
                     {
                         isCrashed = true;
-                        Crashed.Y = CollideBox.Y - CollideRadius;
+                        Crashed.Y = buttom;
                     }
                     if (isCrashed)
                     {
@@ -206,7 +207,6 @@ namespace CursorTail.Core
 
         public Vector2 GetNodeByIndex(int i) => _newNodes[i];
         public Point[] RopeNodes => _dPoints;
-        public float MaxRopeLength => NodeNums * NodeLength / Stiffness;
 
         public void Update(Vector2 cursorPos)
         {

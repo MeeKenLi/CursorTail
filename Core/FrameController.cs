@@ -19,7 +19,7 @@ namespace CursorTail.Core
         private readonly Stopwatch _frameTimer;
         private long _previousFrame;
         private double _accrumulateTime;
-
+        private double _maxDelta;
         public FrameController(UpdatePerFrameHandler updatePerFrame, int targetFps = 60)
         {
             UpdatePerFrame = updatePerFrame;
@@ -29,6 +29,7 @@ namespace CursorTail.Core
             _accrumulateTime = 0;
             _frameCount = 0;
             _previousSecond = 0;
+            _maxDelta = 500;
         }
 
         public void UpdateFrame()
@@ -43,7 +44,8 @@ namespace CursorTail.Core
         private bool AccumulateUpdateTime()
         {
             long currentFrame = _frameTimer.ElapsedMilliseconds;
-            _accrumulateTime += currentFrame - _previousFrame;
+            double delta = currentFrame - _previousFrame;
+            _accrumulateTime += delta < _maxDelta ? delta : _maxDelta;
             _previousFrame = currentFrame;
             if (_accrumulateTime >= TargetFrameTime)
             {
