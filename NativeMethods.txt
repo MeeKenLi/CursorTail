@@ -1,3 +1,5 @@
 GetCursorPos
 SetWindowLong
 GetWindowLong
+RegisterHotKey
+UnregisterHotKey

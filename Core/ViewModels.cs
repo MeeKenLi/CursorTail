@@ -33,6 +33,7 @@ namespace CursorTail.Core
         public PainterVisionHost painter;
         public FrameController frameController;
         public GIFLoder gifLoder;
+        public HotKeyManager hotKeyManager;
         private readonly string SavePath = Path.Combine(AppContext.BaseDirectory, "Config.txt");
 
         public void SaveConfig() => RM.SaveConfigs(SavePath);
@@ -112,6 +113,7 @@ namespace CursorTail.Core
             RM.RC.Add(new(typeof(string), "RopeColor", "255,217,175,66"));
             RM.RC.Add(new(typeof(string), "StrokeColor", "255,156,123,35"));
             RM.RC.Add(new(typeof(bool), "IsFlipGIF", false));
+            RM.RC.Add(new(typeof(bool), "IsRotateGIF", true));
             RM.RC.Add(new(typeof(bool), "IsFollowMode", false));
             RM.RC.Add(new(typeof(bool), "IsLinearRender", true));
         }
@@ -141,6 +143,7 @@ namespace CursorTail.Core
             TargetFPS = RM.RC["TargetFPS"].GetValue(TargetFPS);
             GIFPS = RM.RC["GIFPS"].GetValue(GIFPS);
             GIFMaxLoop = RM.RC["GIFMaxLoop"].GetValue(GIFMaxLoop);
+            IsRotateGIF = RM.RC["IsRotateGIF"].GetValue(IsRotateGIF);
             IsFlipGIF = RM.RC["IsFlipGIF"].GetValue(IsFlipGIF);
             IsFollowMode = RM.RC["IsFollowMode"].GetValue(IsFollowMode);
             IsLinearRender = RM.RC["IsLinearRender"].GetValue(IsLinearRender);
@@ -266,7 +269,7 @@ namespace CursorTail.Core
             {
                 if (value < rope.NodeNums)
                 {
-                    while(value < rope.NodeNums)
+                    while (value < rope.NodeNums)
                     {
                         rope.DeleteNode();
                     }
@@ -519,7 +522,26 @@ namespace CursorTail.Core
                 }
             }
         }
-
+        private bool isExitHKOn;
+        public bool IsExitHKOn
+        {
+            get => isExitHKOn;
+            set
+            {
+                isExitHKOn = value;
+                RaisePropertyChanged();
+            }
+        }
+        private bool isSwitHKOn;
+        public bool IsSwitHKOn
+        {
+            get => isSwitHKOn;
+            set
+            {
+                isSwitHKOn = value;
+                RaisePropertyChanged();
+            }
+        }
         private bool _isStartUp;
         public bool IsStartUp
         {
@@ -530,6 +552,21 @@ namespace CursorTail.Core
                 RaisePropertyChanged();
             }
         }
+
+        private bool _isRotateGif;
+
+        public bool IsRotateGIF
+        {
+            get { return _isRotateGif; }
+            set
+            {
+                _isRotateGif = value;
+                painter.IsRotateGif = value;
+                RaisePropertyChanged();
+                RecordPropChanged(value);
+            }
+        }
+
 
         private string _configPath;
         public string ConfigPath

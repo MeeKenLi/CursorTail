@@ -36,5 +36,9 @@ namespace CursorTail.Core
             RelatviCursorPos.X = (CursorPos.X - CurrentScreen.Bounds.Left) / (float)dpi.DpiScaleX;
             RelatviCursorPos.Y = (CursorPos.Y - CurrentScreen.Bounds.Top) / (float)dpi.DpiScaleY;
         }
+        public static void ResetCursor()
+        {
+            CurrentScreen = null;
+        }
     }
 }

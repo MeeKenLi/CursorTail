@@ -35,6 +35,7 @@ namespace CursorTail.Core
         public bool IsFollowMode;
         public bool IsLinearRender;
         public bool IsFlipGif;
+        public bool IsRotateGif;
 
         private StreamGeometry _geometry;
         private TransformGroup _imgTrans;
@@ -62,7 +63,7 @@ namespace CursorTail.Core
         protected override Visual GetVisualChild(int index) => _visuals[index];
 
         public PainterVisionHost(Rope rope, Color fill, Color stroke, Point imgOffset, double imgAngle, GIFLoder loder,
-            double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, bool isFollow = true, bool isLinear = true, bool flipGif = false)
+            double ropeWidth = 2, double strokeWidth = 0.5, double scale = 0.5, bool isFollow = true, bool isLinear = true, bool flipGif = false, bool isRotateGif = true)
         {
             //同步变量
             _rope = rope;
@@ -76,6 +77,7 @@ namespace CursorTail.Core
             IsFollowMode = isFollow;
             IsFlipGif = flipGif;
             IsLinearRender = isLinear;
+            ReSetBitMapMode();
             //实例化变量
             _geometry = new StreamGeometry();
             _geoVisual = new DrawingVisual();
@@ -92,9 +94,10 @@ namespace CursorTail.Core
             _imgTrans.Children.Add(_imgFlip);
             _imgTrans.Children.Add(_imgRotate);
             _gifLoder = loder;
+            IsRotateGif = isRotateGif;
         }
         public void ReSetBitMapMode() =>
-            RenderOptions.SetBitmapScalingMode(_imgVisual, IsLinearRender ? BitmapScalingMode.Linear : BitmapScalingMode.NearestNeighbor);
+        RenderOptions.SetBitmapScalingMode(this, IsLinearRender ? BitmapScalingMode.HighQuality : BitmapScalingMode.NearestNeighbor);
         /// <summary>
         /// 该函数内仅发生Color、Width、Scale、变化时触发
         /// </summary>
@@ -143,7 +146,7 @@ namespace CursorTail.Core
             //旋转：旋转中心+角度偏移
             _imgRotate.CenterX = _imgFlip.CenterX = ropeNodes[secondLastIndex + 1].X;
             _imgRotate.CenterY = _imgFlip.CenterY = ropeNodes[secondLastIndex + 1].Y;
-            if (A2B.Y < 0.05f && A2B.Y > 0 || A2B.Y > -0.05f && A2B.Y < 0)
+            if (A2B.Y < 0.05f && A2B.Y > 0 || A2B.Y > -0.05f && A2B.Y < 0 || !IsRotateGif)
             {
                 _imgRotate.Angle = 90 * (A2B.X >= 0 ? 1 : -1) + ImgAngleOffset;
             }
@@ -155,7 +158,6 @@ namespace CursorTail.Core
                     _imgRotate.Angle += 180;
                 }
             }
-
             if (RopeWidth != 0 || StrokeWidth != 0)
             {
                 using (StreamGeometryContext sgc = _geometry.Open())

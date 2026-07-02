@@ -39,38 +39,53 @@ namespace CursorTail
         public MainWindowViewModel ViewModel;
         public StateMachine stateMachine;
         public GIFLoder gifLoder;
-        public MainWindow()
+        public MainWindow(StateMachine stateMachine, Rope rope, GIFLoder gifLoder, PainterVisionHost painter, FrameController frameController, MainWindowViewModel viewModel)
         {
             InitializeComponent();
+
+            //窗口属性
             _dpiScale = VisualTreeHelper.GetDpi(this);
             _screens = Screen.AllScreens.Select(s => s.WorkingArea).ToArray();
             SourceInitialized += OnSourceInitialized;
             this.SnapsToDevicePixels = true;
+            this.WindowState = WindowState.Normal;
 
             //实例化
-            stateMachine = new();
-            rope = new Rope(stateMachine);
-            //绑定鼠标跨屏事件
-            CL.RaiseDeskTopChange += (System.Drawing.Rectangle bound) =>
-            {
-                this.Top = bound.Top;
-                this.Left = bound.Left;
-                this.Width = bound.Width / _dpiScale.DpiScaleX;
-                this.Height = bound.Height / _dpiScale.DpiScaleY;
-                rope.CollideBox = new(0,0, (float)Width, (float)Height);
-            };
-            this.WindowState = WindowState.Normal;
-            gifLoder = new(stateMachine, 4);
-            painter = new PainterVisionHost(rope, Color.FromRgb(255, 255, 0), Color.FromRgb(0, 0, 0), new Point(0, 0), 0, gifLoder);
-            MainCanvas.Children.Add(painter);
-            frameController = new FrameController(UpdatePerFrame, 60);
-            ViewModel = new MainWindowViewModel(rope, painter, frameController, gifLoder);
+            this.stateMachine = stateMachine;
+            this.rope = rope;
+            this.gifLoder = gifLoder;
+            this.painter = painter;
+            this.frameController = frameController;
+            this.ViewModel = viewModel;
 
             //绑定事件
+            MainCanvas.Children.Add(painter);
+            CL.RaiseDeskTopChange += MouseCrossScreen;
+            this.frameController.UpdatePerFrame += UpdatePerFrame;
             //CompositionTarget.Rendering += (s,e)=> frameController.UpdateFrame();
-            LoadTaskIcon();
-            LoadReTopFC();
+            var reTopAction = GetReTopAction();
+            frameController.UpdatePerFrame += reTopAction;
             DispatcherTimer timer = new DispatcherTimer(TimeSpan.FromMicroseconds(6), DispatcherPriority.Render, (s, e) => frameController.UpdateFrame(), Dispatcher);
+
+            //解绑事件
+            this.Closing += (s, e) =>
+            {
+                MainCanvas.Children.Clear();
+                CL.RaiseDeskTopChange -= MouseCrossScreen;
+                this.frameController.UpdatePerFrame -= UpdatePerFrame;
+                this.frameController.UpdatePerFrame -= reTopAction;
+                timer.Stop();
+                CL.ResetCursor();
+            };
+        }
+
+        private void MouseCrossScreen(System.Drawing.Rectangle bound)
+        {
+            this.Top = bound.Top;
+            this.Left = bound.Left;
+            this.Width = bound.Width / _dpiScale.DpiScaleX;
+            this.Height = bound.Height / _dpiScale.DpiScaleY;
+            rope.CollideBox = new(0, 0, (float)Width, (float)Height);
         }
 
         private void UpdatePerFrame()
@@ -95,49 +110,7 @@ namespace CursorTail
             PInvoke.SetWindowLong(new HWND(hwnd), GWL_EXSTYLE, currentExStyle | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW);
         }
 
-        SettingWindow? _settingWindow;
-        private void LoadTaskIcon()
-        {
-            NotifyIcon notifyIcon = new NotifyIcon()
-            {
-                Text = "CursorTail",
-                Icon = new System.Drawing.Icon(System.IO.Path.Combine(AppContext.BaseDirectory, "Core/icon.ico")),
-            };
-            EventHandler openSetting = (s, e) =>
-            {
-                if (_settingWindow == null)
-                {
-                    _settingWindow = new SettingWindow(ViewModel, painter);
-                    _settingWindow.Closed += (s, e) => _settingWindow = null;
-                    _settingWindow.Show();
-                }
-                else
-                {
-                    _settingWindow.Topmost = true;
-                    _settingWindow.Topmost = false;
-                }
-            };
-            notifyIcon.DoubleClick += openSetting;
-            ContextMenuStrip contextMenu = new ContextMenuStrip();
-            ToolStripMenuItem setting = new("设置");
-            setting.Click += openSetting;
-            ToolStripMenuItem exit = new("退出");
-            exit.Click += (s, e) => this.Close();
-            contextMenu.Items.Add(setting);
-            contextMenu.Items.Add(exit);
-            notifyIcon.ContextMenuStrip = contextMenu;
-            notifyIcon.Visible = true;
-            this.Closing += (s, e) =>
-            {
-                notifyIcon.Dispose();
-                if (_settingWindow != null)
-                {
-                    _settingWindow.Close();
-                }
-            };
-        }
-
-        private void LoadReTopFC()
+        private FrameController.UpdatePerFrameHandler GetReTopAction()
         {
             FrameController fc = new FrameController(() =>
             {
@@ -147,7 +120,7 @@ namespace CursorTail
             {
                 TargetFrameTime = 10 * 1000,
             };
-            frameController.UpdatePerFrame += fc.UpdateFrame;
+            return fc.UpdateFrame;
         }
     }
 }

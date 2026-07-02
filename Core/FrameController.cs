@@ -10,7 +10,7 @@ namespace CursorTail.Core
     public class FrameController
     {
         public delegate void UpdatePerFrameHandler();
-        public UpdatePerFrameHandler UpdatePerFrame;
+        public UpdatePerFrameHandler? UpdatePerFrame;
 
         public double TargetFrameTime;
         public int FPS;
@@ -31,12 +31,22 @@ namespace CursorTail.Core
             _previousSecond = 0;
             _maxDelta = 500;
         }
+        public FrameController(int targetFps = 60)
+        {
+            TargetFrameTime = 1.0 / (double)targetFps * 1000;
+            _frameTimer = Stopwatch.StartNew();
+            _previousFrame = 0;
+            _accrumulateTime = 0;
+            _frameCount = 0;
+            _previousSecond = 0;
+            _maxDelta = 500;
+        }
 
         public void UpdateFrame()
         {
             if (AccumulateUpdateTime())
             {
-                UpdatePerFrame.Invoke();
+                UpdatePerFrame?.Invoke();
             }
             AccumulateSecondTime();
         }

@@ -130,6 +130,20 @@ namespace CursorTail.Core
             });
         }
 
+        /// <summary>
+        /// 将绳子在不附加任何速度的基础上整个偏移一个向量
+        /// 将在新旧两个点集上操作，不保留任何偏移的速度信息
+        /// </summary>
+        /// <param name="offset"></param>
+        public void RopeOffset(Vector2 offset)
+        {
+            Parallel.For(0, _newNodes.Count+1, (i) =>
+            {
+                _newNodes[i]-=offset;
+                _oldNodes[i]-=offset;
+            });
+        }
+
         public void ConstraintIteration()
         {
             for (int _ = 0; _ < Iterations; _++)
